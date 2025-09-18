@@ -41,6 +41,8 @@ export default function TabLayout() {
   const [selectedType, setSelectedType] = useState('Select Property Type');
   const [minPrice, setMinPrice] = useState('Min Price');
   const [maxPrice, setMaxPrice] = useState('Max Price');
+  
+  const showPropertyFilters = pathname === '/';
 
   const TopNavigation = () => (
     <View style={styles.topNavContainer}>
@@ -167,8 +169,12 @@ export default function TabLayout() {
     <LinearGradient colors={['#0f0f23', '#1a1a2e', '#16213e']} style={styles.container}>
       <Header />
       <TopNavigation />
-      <PropertyTypeButtons />
-      <SearchSection />
+      {showPropertyFilters && (
+        <>
+          <PropertyTypeButtons />
+          <SearchSection />
+        </>
+      )}
       
       <Tabs
         screenOptions={{

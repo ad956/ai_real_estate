@@ -308,11 +308,14 @@ const styles = StyleSheet.create({
   categoryTitle: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#ffffff',
+    color: '#333333',
     marginHorizontal: 20,
     marginBottom: 20,
     lineHeight: 30,
     letterSpacing: -0.5,
+    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   horizontalList: {
     paddingLeft: 20,

@@ -61,7 +61,7 @@ export default function StoriesScreen() {
             month: 'long',
             year: 'numeric'
           }),
-          category: 'Buy', // Default category since not provided in API
+          category: 'Buy',
           content: story.details?.[0]?.description || 'No description available',
           images: story.details?.map((detail: any, index: number) => 
             detail.img ? `https://aiinrealestate.in/api${detail.img}` : `https://picsum.photos/400/300?random=${story.id}${index}`
@@ -126,26 +126,6 @@ export default function StoriesScreen() {
     </TouchableOpacity>
   );
 
-  const renderCategoryButton = (category: string) => (
-    <TouchableOpacity
-      key={category}
-      style={[
-        styles.categoryButton,
-        selectedCategory === category && styles.selectedCategoryButton,
-      ]}
-      onPress={() => setSelectedCategory(category)}
-    >
-      <Text
-        style={[
-          styles.categoryButtonText,
-          selectedCategory === category && styles.selectedCategoryButtonText,
-        ]}
-      >
-        {category}
-      </Text>
-    </TouchableOpacity>
-  );
-
   const filteredStories = stories.filter(story =>
     story.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
     (selectedCategory === 'Buy' || story.category === selectedCategory)
@@ -153,67 +133,65 @@ export default function StoriesScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
-      
-      {/* Header */}
-      <View style={styles.headerSection}>
-        <Text style={styles.headerTitle}>Web-Stories</Text>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <StatusBar barStyle="light-content" />
         
-        {/* Category Buttons */}
-        <View style={styles.categoryButtons}>
-          {CATEGORIES.map((category) => (
-            <TouchableOpacity
-              key={category}
-              style={[
-                styles.categoryButton,
-                selectedCategory === category && styles.selectedCategoryButton,
-              ]}
-              onPress={() => setSelectedCategory(category)}
-            >
-              <Text
+        <View style={styles.headerSection}>
+          <Text style={styles.headerTitle}>Web-Stories</Text>
+          
+          <View style={styles.categoryButtons}>
+            {CATEGORIES.map((category) => (
+              <TouchableOpacity
+                key={category}
                 style={[
-                  styles.categoryButtonText,
-                  selectedCategory === category && styles.selectedCategoryButtonText,
+                  styles.categoryButton,
+                  selectedCategory === category && styles.selectedCategoryButton,
                 ]}
+                onPress={() => setSelectedCategory(category)}
               >
-                {category}
-              </Text>
+                <Text
+                  style={[
+                    styles.categoryButtonText,
+                    selectedCategory === category && styles.selectedCategoryButtonText,
+                  ]}
+                >
+                  {category}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          
+          <View style={styles.searchContainer}>
+            <Search size={20} color="#a0a9ff" />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search web stories..."
+              placeholderTextColor="#a0a9ff"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            <TouchableOpacity style={styles.micButton}>
+              <Mic size={18} color="#6c5ce7" />
             </TouchableOpacity>
-          ))}
+          </View>
         </View>
         
-        {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <Search size={20} color="#a0a9ff" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search web stories..."
-            placeholderTextColor="#a0a9ff"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
+        {loading ? (
+          <LoadingSpinner message="Loading stories..." />
+        ) : (
+          <FlatList
+            data={filteredStories}
+            renderItem={renderStoryCard}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+            columnWrapperStyle={styles.row}
+            contentContainerStyle={styles.storiesGrid}
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={false}
           />
-          <TouchableOpacity style={styles.micButton}>
-            <Mic size={18} color="#6c5ce7" />
-          </TouchableOpacity>
-        </View>
-      </View>
+        )}
+      </ScrollView>
       
-      {/* Stories Grid */}
-      {loading ? (
-        <LoadingSpinner message="Loading stories..." />
-      ) : (
-        <FlatList
-          data={filteredStories}
-          renderItem={renderStoryCard}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          columnWrapperStyle={styles.row}
-          contentContainerStyle={styles.storiesGrid}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
-
-      {/* Story Viewer Modal */}
       <Modal
         visible={!!selectedStory}
         transparent={true}
@@ -224,7 +202,6 @@ export default function StoriesScreen() {
           <View style={styles.storyViewer}>
             <StatusBar backgroundColor="#000000" barStyle="light-content" />
             
-            {/* Progress Bar */}
             <View style={styles.progressContainer}>
               {selectedStory.images.map((_, index) => (
                 <View
@@ -237,13 +214,11 @@ export default function StoriesScreen() {
               ))}
             </View>
 
-            {/* Close Button */}
             <TouchableOpacity style={styles.closeButton} onPress={closeStoryViewer}>
               <X size={24} color="#ffffff" />
             </TouchableOpacity>
 
-            {/* Story Content */}
-            <View style={styles.storyContent}>
+            <View style={styles.storyContentModal}>
               <Image
                 source={{ uri: selectedStory.images[currentSlide] }}
                 style={styles.fullscreenImage}
@@ -259,7 +234,6 @@ export default function StoriesScreen() {
               </LinearGradient>
             </View>
 
-            {/* Navigation */}
             <TouchableOpacity
               style={[styles.navButton, styles.prevButton]}
               onPress={prevSlide}
@@ -285,7 +259,6 @@ export default function StoriesScreen() {
   );
 }
 
-// Mock data
 const mockStories: WebStory[] = [
   {
     id: '1',
@@ -293,45 +266,10 @@ const mockStories: WebStory[] = [
     image: 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg',
     date: '13th March 2025',
     category: 'Sale',
-    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce quis rhoncus libero.',
+    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     images: [
       'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg',
       'https://images.pexels.com/photos/186077/pexels-photo-186077.jpeg',
-      'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg',
-    ],
-  },
-  {
-    id: '2',
-    title: '50 Lacs Apartments In Bopal',
-    image: 'https://images.pexels.com/photos/186077/pexels-photo-186077.jpeg',
-    date: '16th March 2025',
-    category: 'Sale',
-    content: 'Beautiful apartments with modern amenities and great location.',
-    images: [
-      'https://images.pexels.com/photos/186077/pexels-photo-186077.jpeg',
-      'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg',
-    ],
-  },
-  {
-    id: '3',
-    title: '3 bhk apartments on rent',
-    image: 'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg',
-    date: '18th March 2025',
-    category: 'Rent',
-    content: 'Spacious 3BHK apartments available for rent in prime locations.',
-    images: [
-      'https://images.pexels.com/photos/280222/pexels-photo-280222.jpeg',
-    ],
-  },
-  {
-    id: '4',
-    title: 'Selling or Buying A Home?',
-    image: 'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg',
-    date: '18th March 2025',
-    category: 'Buy',
-    content: 'Expert guidance for selling or buying your dream home.',
-    images: [
-      'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg',
     ],
   },
 ];
@@ -445,7 +383,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     padding: 18,
-    background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.8) 100%)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
   categoryBadge: {
     alignSelf: 'flex-start',
@@ -481,7 +419,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
   },
-
   storyViewer: {
     flex: 1,
     backgroundColor: '#000000',
@@ -509,7 +446,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 1,
   },
-  storyContent: {
+  storyContentModal: {
     flex: 1,
     marginTop: 20,
   },
