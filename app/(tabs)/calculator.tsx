@@ -149,6 +149,10 @@ export default function EMICalculatorScreen() {
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View style={styles.headerSection}>
+          <Text style={styles.headerTitle}>EMI Calculator</Text>
+        </View>
         {/* Input Section */}
         <View style={styles.inputSection}>
           {/* Loan Amount */}
@@ -283,9 +287,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
+  headerSection: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#74b9ff',
+    marginBottom: 10,
+  },
   inputSection: {
     paddingHorizontal: 20,
-    marginTop: 20,
     marginBottom: 30,
   },
   inputGroup: {

@@ -179,8 +179,13 @@ export default function BlogScreen() {
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View style={styles.headerSection}>
+          <Text style={styles.headerTitle}>Blog</Text>
+        </View>
+
         {/* Featured Post */}
-        <View style={[styles.featuredSection, { marginTop: 20 }]}>
+        <View style={styles.featuredSection}>
           <Text style={styles.sectionTitle}>Featured Article</Text>
           {renderFeaturedPost()}
         </View>
@@ -205,20 +210,40 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
+  headerSection: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#ffffff',
+    marginBottom: 15,
+    textAlign: 'center',
+    textShadowColor: 'rgba(108, 92, 231, 0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
   featuredSection: {
     paddingHorizontal: 20,
     marginBottom: 30,
   },
   sectionTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: '800',
     color: '#ffffff',
-    marginBottom: 15,
+    marginBottom: 20,
+    letterSpacing: -0.5,
   },
   featuredCard: {
-    height: 320,
-    borderRadius: 20,
+    height: 340,
+    borderRadius: 25,
     overflow: 'hidden',
+    elevation: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
   },
   featuredGradient: {
     flex: 1,
@@ -238,10 +263,15 @@ const styles = StyleSheet.create({
   categoryBadge: {
     alignSelf: 'flex-start',
     backgroundColor: '#ff6b35',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 15,
-    marginBottom: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginBottom: 15,
+    shadowColor: '#ff6b35',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 4,
   },
   smallCategoryBadge: {
     paddingHorizontal: 8,
@@ -258,11 +288,14 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   featuredTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontWeight: '800',
     color: '#ffffff',
-    marginBottom: 10,
-    lineHeight: 30,
+    marginBottom: 12,
+    lineHeight: 32,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   featuredExcerpt: {
     fontSize: 16,
@@ -294,17 +327,24 @@ const styles = StyleSheet.create({
   },
   blogCard: {
     marginBottom: 20,
-    borderRadius: 15,
+    borderRadius: 20,
     overflow: 'hidden',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
   cardGradient: {
     flexDirection: 'row',
-    padding: 15,
+    padding: 18,
   },
   blogImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 12,
+    width: 110,
+    height: 110,
+    borderRadius: 16,
+    backgroundColor: '#f0f0f0',
   },
   blogContent: {
     flex: 1,
@@ -318,11 +358,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   blogTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 17,
+    fontWeight: '800',
     color: '#ffffff',
-    marginBottom: 8,
-    lineHeight: 20,
+    marginBottom: 10,
+    lineHeight: 22,
   },
   blogExcerpt: {
     fontSize: 13,

@@ -4,16 +4,13 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  Image,
-  TouchableOpacity,
-  TextInput,
   FlatList,
   Dimensions,
-  Alert,
-  Linking,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Search, MapPin, Heart, Phone, Filter } from 'lucide-react-native';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import ModernPropertyCard from '../../components/ModernPropertyCard';
+import NotificationBanner from '../../components/NotificationBanner';
+import { logApiRequest, logApiResponse, logApiError } from '../../utils/apiLogger';
 
 const { width } = Dimensions.get('window');
 
@@ -27,6 +24,7 @@ interface Property {
   status: string;
   description: string;
   image: string;
+  fallbackImage: string;
   area?: string;
   bedrooms?: number;
   bathrooms?: number;
@@ -40,24 +38,76 @@ interface Category {
 
 export default function HomeScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [recommendedProperties, setRecommendedProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showNotification, setShowNotification] = useState(true);
 
   useEffect(() => {
     fetchCategoryProperties();
-    fetchRecommendedProperties();
   }, []);
 
   const fetchCategoryProperties = async () => {
+    const endpoint = 'https://aiinrealestate.in/api/category_property';
     try {
-      const response = await fetch('https://aiinrealestate.in/api/category_property');
+      logApiRequest(endpoint);
+      const response = await fetch(endpoint);
       const data = await response.json();
-      if (data.success) {
-        setCategories(data.categories || []);
+      logApiResponse(endpoint, data);
+      
+      if (data.success && data.data) {
+        const transformedCategories = data.data.map((category: any) => ({
+          id: category.category_id.toString(),
+          name: category.category_name,
+          properties: category.properties.map((prop: any) => ({
+            id: prop.id.toString(),
+            title: prop.title,
+            price: prop.price || 'Price on request',
+            location: prop.location,
+            city: prop.city,
+            type: prop.property_type,
+            status: prop.status,
+            description: prop.features || prop.description || '',
+            image: prop.images?.[0] ? `https://aiinrealestate.in/api${prop.images[0]}` : `https://picsum.photos/400/300?random=${prop.id}`,
+            fallbackImage: `https://picsum.photos/400/300?random=${prop.id}`,
+            area: prop.property_details?.[0]?.plotArea || 'N/A',
+            bedrooms: prop.bedrooms || 0,
+            bathrooms: prop.bathrooms || 0,
+          }))
+        }));
+        
+        // Add additional categories based on property status
+        const allProperties = transformedCategories.flatMap(cat => cat.properties);
+        const additionalCategories = [
+          {
+            id: 'recommended',
+            name: 'Recommended Properties',
+            properties: allProperties.slice(0, 8).map((prop, index) => ({ ...prop, id: `rec_${prop.id}_${index}` }))
+          },
+          {
+            id: 'new-launch',
+            name: 'New Launch',
+            properties: allProperties.filter(p => p.status.includes('Construction')).slice(0, 6).map((prop, index) => ({ ...prop, id: `new_${prop.id}_${index}` }))
+          },
+          {
+            id: 'ready-to-move',
+            name: 'Ready To Move',
+            properties: allProperties.filter(p => p.status === 'Ready To Move').slice(0, 6).map((prop, index) => ({ ...prop, id: `ready_${prop.id}_${index}` }))
+          },
+          {
+            id: 'under-construction',
+            name: 'Under Construction',
+            properties: allProperties.filter(p => p.status === 'Under Construction').slice(0, 6).map((prop, index) => ({ ...prop, id: `under_${prop.id}_${index}` }))
+          }
+        ].filter(cat => cat.properties.length > 0);
+        
+        const finalCategories = [...transformedCategories, ...additionalCategories];
+        console.log('✅ Transformed categories:', finalCategories.length);
+        setCategories(finalCategories);
+      } else {
+        console.warn('⚠️ Invalid category data structure');
+        setCategories(mockCategories);
       }
     } catch (error) {
-      console.error('Error fetching categories:', error);
-      // Fallback with mock data
+      logApiError(endpoint, error);
       setCategories(mockCategories);
     } finally {
       setLoading(false);
@@ -65,14 +115,36 @@ export default function HomeScreen() {
   };
 
   const fetchRecommendedProperties = async () => {
+    const endpoint = 'https://aiinrealestate.in/api/property';
     try {
-      const response = await fetch('https://aiinrealestate.in/api/property');
+      logApiRequest(endpoint);
+      const response = await fetch(endpoint);
       const data = await response.json();
-      if (data.success) {
-        setRecommendedProperties(data.properties?.slice(0, 10) || []);
+      logApiResponse(endpoint, data);
+      
+      if (data.success && data.properties) {
+        const transformedProperties = data.properties.slice(0, 10).map((prop: any) => ({
+          id: prop.id.toString(),
+          title: prop.title,
+          price: prop.price || 'Price on request',
+          location: prop.location,
+          city: prop.city,
+          type: prop.property_type,
+          status: prop.status,
+          description: prop.features || prop.description || '',
+          image: prop.images?.[0] ? `https://aiinrealestate.in${prop.images[0]}` : 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg',
+          area: prop.property_details?.[0]?.plotArea || 'N/A',
+          bedrooms: prop.bedrooms || 0,
+          bathrooms: prop.bathrooms || 0,
+        }));
+        console.log('✅ Transformed recommended properties:', transformedProperties.length);
+        setRecommendedProperties(transformedProperties);
+      } else {
+        console.warn('⚠️ Invalid properties data structure');
+        setRecommendedProperties(mockProperties);
       }
     } catch (error) {
-      console.error('Error fetching properties:', error);
+      logApiError(endpoint, error);
       setRecommendedProperties(mockProperties);
     }
   };
@@ -83,45 +155,21 @@ export default function HomeScreen() {
     Linking.openURL(whatsappUrl);
   };
 
+
+
   const renderPropertyCard = ({ item }: { item: Property }) => (
-    <TouchableOpacity
-      style={styles.propertyCard}
+    <ModernPropertyCard 
+      property={item} 
       onPress={() => handleWhatsAppContact(item)}
-      activeOpacity={0.9}
-    >
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.cardGradient}
-      >
-        <Image source={{ uri: item.image }} style={styles.propertyImage} />
-        <View style={styles.propertyInfo}>
-          <Text style={styles.propertyTitle} numberOfLines={2}>
-            {item.title}
-          </Text>
-          <View style={styles.locationRow}>
-            <MapPin size={14} color="#a0a9ff" />
-            <Text style={styles.locationText}>
-              {item.location}, {item.city}
-            </Text>
-          </View>
-          <View style={styles.priceRow}>
-            <Text style={styles.priceText}>₹{item.price}</Text>
-            <TouchableOpacity style={styles.heartButton}>
-              <Heart size={18} color="#ff6b9d" />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.typeRow}>
-            <Text style={styles.typeText}>{item.type}</Text>
-            <Text style={styles.statusText}>{item.status}</Text>
-          </View>
-        </View>
-      </LinearGradient>
-    </TouchableOpacity>
+      style={styles.propertyCard}
+    />
   );
 
   const renderCategorySection = ({ item }: { item: Category }) => (
     <View style={styles.categorySection}>
-      <Text style={styles.categoryTitle}>{item.name}</Text>
+      <View style={styles.titleSection}>
+        <Text style={styles.categoryTitle}>{item.name}</Text>
+      </View>
       <FlatList
         data={item.properties}
         renderItem={renderPropertyCard}
@@ -135,34 +183,28 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      {/* Notification Banner */}
+      {showNotification && (
+        <NotificationBanner
+          type="whatsapp"
+          message="🏠 Get instant property updates on WhatsApp! Connect with verified agents."
+          actionText="Connect"
+          onClose={() => setShowNotification(false)}
+          duration={8000}
+        />
+      )}
+      
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
         {/* Categories and Properties */}
         {loading ? (
-          <View style={styles.loadingContainer}>
-            <Text style={styles.loadingText}>Loading properties...</Text>
-          </View>
+          <LoadingSpinner message="Loading properties..." />
         ) : (
-          <>
-            <FlatList
-              data={categories}
-              renderItem={renderCategorySection}
-              keyExtractor={(category) => category.id}
-              scrollEnabled={false}
-            />
-
-            {/* Recommended Properties */}
-            <View style={styles.categorySection}>
-              <Text style={styles.categoryTitle}>Recommended for You</Text>
-              <FlatList
-                data={recommendedProperties}
-                renderItem={renderPropertyCard}
-                keyExtractor={(prop) => prop.id}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.horizontalList}
-              />
-            </View>
-          </>
+          <FlatList
+            data={categories}
+            renderItem={renderCategorySection}
+            keyExtractor={(category) => category.id}
+            scrollEnabled={false}
+          />
         )}
       </ScrollView>
     </View>
@@ -173,38 +215,81 @@ export default function HomeScreen() {
 const mockProperties: Property[] = [
   {
     id: '1',
-    title: '3 BHK Luxury Apartment',
-    price: '75,00,000',
-    location: 'Bopal',
-    city: 'Ahmedabad',
-    type: 'Apartment',
+    title: 'NA Approved Land',
+    price: '3 Cr to 3.5 Cr',
+    location: 'Por',
+    city: 'Vadodara',
+    type: 'Land',
     status: 'For Sale',
-    description: 'Spacious 3BHK apartment with modern amenities',
-    image: 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg',
+    description: 'B1,440 SqFt NA Approved Land',
+    image: 'https://picsum.photos/400/300?random=1',
+    fallbackImage: 'https://picsum.photos/400/300?random=1',
+    area: 'N/ABHK',
   },
   {
     id: '2',
-    title: '2 BHK Modern Villa',
-    price: '1,20,00,000',
-    location: 'Satellite',
-    city: 'Ahmedabad',
-    type: 'Villa',
-    status: 'For Sale',
-    description: 'Beautiful villa with garden and parking',
-    image: 'https://images.pexels.com/photos/186077/pexels-photo-186077.jpeg',
+    title: '4BHK Apartments',
+    price: '60 lakhs to 90 lakhs',
+    location: 'Gotri',
+    city: 'Vadodara',
+    type: 'Apartment',
+    status: 'Under Construction',
+    description: 'Yash Complex Gotri Main Road',
+    image: 'https://picsum.photos/400/300?random=2',
+    fallbackImage: 'https://picsum.photos/400/300?random=2',
+    area: 'N/ABHK',
+  },
+  {
+    id: '3',
+    title: '3 BHK Apartment in Sunpharma',
+    price: '25 L to 30 L',
+    location: 'Sunpharma Road',
+    city: 'Vadodara',
+    type: 'Apartment',
+    status: 'Ready To Move',
+    description: 'Ready to move 3BHK apartment',
+    image: 'https://picsum.photos/400/300?random=3',
+    fallbackImage: 'https://picsum.photos/400/300?random=3',
+    area: 'N/ABHK',
+  },
+  {
+    id: '4',
+    title: '2 BHK Flats in Atladara',
+    price: '30 L to 35 L',
+    location: 'Atladara',
+    city: 'Vadodara',
+    type: 'Flat',
+    status: 'Ready To Move',
+    description: 'Ready to move 2BHK flats',
+    image: 'https://picsum.photos/400/300?random=4',
+    fallbackImage: 'https://picsum.photos/400/300?random=4',
+    area: 'N/ABHK',
+  },
+  {
+    id: '5',
+    title: '4 BHK Luxurious Flats in New Alkapuri',
+    price: '1 Cr to 1.10 Cr',
+    location: 'New Alkapuri',
+    city: 'Vadodara',
+    type: 'Flat',
+    status: 'Under Construction',
+    description: 'Own your Zero Comfort Home',
+    image: 'https://picsum.photos/400/300?random=5',
+    fallbackImage: 'https://picsum.photos/400/300?random=5',
+    area: 'N/ABHK',
   },
 ];
 
 const mockCategories: Category[] = [
   {
     id: '1',
-    name: 'Premium Apartments',
+    name: 'Featured Properties',
     properties: mockProperties,
   },
   {
     id: '2',
-    name: 'Luxury Villas',
-    properties: mockProperties,
+    name: 'New Launches',
+    properties: mockProperties.slice(0, 3),
   },
 ];
 
@@ -213,97 +298,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
+  scrollView: {
+    flex: 1,
+    paddingTop: 10,
+  },
   categorySection: {
-    marginBottom: 30,
+    marginBottom: 35,
   },
   categoryTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: '800',
     color: '#ffffff',
     marginHorizontal: 20,
-    marginBottom: 15,
+    marginBottom: 20,
+    lineHeight: 30,
+    letterSpacing: -0.5,
   },
   horizontalList: {
     paddingLeft: 20,
+    paddingRight: 10,
   },
   propertyCard: {
-    width: width * 0.8,
     marginRight: 15,
-    borderRadius: 20,
-    overflow: 'hidden',
-  },
-  cardGradient: {
-    padding: 15,
-  },
-  propertyImage: {
-    width: '100%',
-    height: 180,
-    borderRadius: 15,
-    marginBottom: 15,
-  },
-  propertyInfo: {
-    gap: 8,
-  },
-  propertyTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#ffffff',
-  },
-  locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-  },
-  locationText: {
-    fontSize: 14,
-    color: '#a0a9ff',
-  },
-  priceRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  priceText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#00ff88',
-  },
-  heartButton: {
-    width: 35,
-    height: 35,
-    borderRadius: 17.5,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  typeRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  typeText: {
-    fontSize: 14,
-    color: '#74b9ff',
-    backgroundColor: 'rgba(116, 185, 255, 0.2)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
-  },
-  statusText: {
-    fontSize: 14,
-    color: '#00ff88',
-    backgroundColor: 'rgba(0, 255, 136, 0.2)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 50,
-  },
-  loadingText: {
-    color: '#a0a9ff',
-    fontSize: 16,
   },
 });

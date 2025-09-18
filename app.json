@@ -1,15 +1,43 @@
 {
   "expo": {
-    "name": "bolt-expo-nativewind",
+    "name": "AI in Real Estate",
     "slug": "bolt-expo-nativewind",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
+    "scheme": "aiinrealestate",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "backgroundColor": "#0f0f23",
+    "primaryColor": "#6c5ce7",
+    "splash": {
+      "image": "./assets/images/app_logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f0f23"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.aiinrealestate.app",
+      "splash": {
+        "image": "./assets/images/app_logo.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#0f0f23"
+      }
+    },
+    "android": {
+      "package": "com.aiinrealestate.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#0f0f23"
+      },
+      "splash": {
+        "image": "./assets/images/app_logo.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#0f0f23"
+      },
+      "permissions": [
+        "INTERNET"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -29,6 +57,7 @@
       "eas": {
         "projectId": "6d03079f-50e8-4162-9325-f1669750895f"
       }
-    }
+    },
+    "owner": "dilipkumar189"
   }
 }

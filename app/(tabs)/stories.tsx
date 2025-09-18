@@ -10,9 +10,12 @@ import {
   Dimensions,
   Modal,
   StatusBar,
+  TextInput,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Search, X, ChevronLeft, ChevronRight, Mic } from 'lucide-react-native';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import { logApiRequest, logApiResponse, logApiError } from '../../utils/apiLogger';
 
 const { width, height } = Dimensions.get('window');
 
@@ -41,14 +44,37 @@ export default function StoriesScreen() {
   }, []);
 
   const fetchWebStories = async () => {
+    const endpoint = 'https://aiinrealestate.in/api/webstories';
     try {
-      const response = await fetch('https://aiinrealestate.in/api/webstories');
+      logApiRequest(endpoint);
+      const response = await fetch(endpoint);
       const data = await response.json();
-      if (data.success) {
-        setStories(data.stories || []);
+      logApiResponse(endpoint, data);
+      
+      if (data.success && data.webstories) {
+        const transformedStories = data.webstories.map((story: any) => ({
+          id: story.id.toString(),
+          title: story.title,
+          image: story.details?.[0]?.img ? `https://aiinrealestate.in/api${story.details[0].img}` : `https://picsum.photos/400/300?random=${story.id}`,
+          date: new Date(story.date).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          }),
+          category: 'Buy', // Default category since not provided in API
+          content: story.details?.[0]?.description || 'No description available',
+          images: story.details?.map((detail: any, index: number) => 
+            detail.img ? `https://aiinrealestate.in/api${detail.img}` : `https://picsum.photos/400/300?random=${story.id}${index}`
+          ) || [`https://picsum.photos/400/300?random=${story.id}`],
+        }));
+        console.log('✅ Transformed web stories:', transformedStories.length);
+        setStories(transformedStories);
+      } else {
+        console.warn('⚠️ Invalid web stories data structure');
+        setStories(mockStories);
       }
     } catch (error) {
-      console.error('Error fetching web stories:', error);
+      logApiError(endpoint, error);
       setStories(mockStories);
     } finally {
       setLoading(false);
@@ -83,21 +109,20 @@ export default function StoriesScreen() {
       onPress={() => openStoryViewer(item)}
       activeOpacity={0.9}
     >
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={styles.cardGradient}
-      >
+      <View style={styles.cardContainer}>
         <Image source={{ uri: item.image }} style={styles.storyImage} />
         <View style={styles.storyOverlay}>
           <View style={styles.categoryBadge}>
             <Text style={styles.categoryText}>{item.category}</Text>
           </View>
-          <Text style={styles.storyTitle} numberOfLines={2}>
-            {item.title}
-          </Text>
-          <Text style={styles.storyDate}>{item.date}</Text>
+          <View style={styles.storyContent}>
+            <Text style={styles.storyTitle} numberOfLines={2}>
+              {item.title}
+            </Text>
+            <Text style={styles.storyDate}>{item.date}</Text>
+          </View>
         </View>
-      </LinearGradient>
+      </View>
     </TouchableOpacity>
   );
 
@@ -130,11 +155,52 @@ export default function StoriesScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       
+      {/* Header */}
+      <View style={styles.headerSection}>
+        <Text style={styles.headerTitle}>Web-Stories</Text>
+        
+        {/* Category Buttons */}
+        <View style={styles.categoryButtons}>
+          {CATEGORIES.map((category) => (
+            <TouchableOpacity
+              key={category}
+              style={[
+                styles.categoryButton,
+                selectedCategory === category && styles.selectedCategoryButton,
+              ]}
+              onPress={() => setSelectedCategory(category)}
+            >
+              <Text
+                style={[
+                  styles.categoryButtonText,
+                  selectedCategory === category && styles.selectedCategoryButtonText,
+                ]}
+              >
+                {category}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <Search size={20} color="#a0a9ff" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search web stories..."
+            placeholderTextColor="#a0a9ff"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          <TouchableOpacity style={styles.micButton}>
+            <Mic size={18} color="#6c5ce7" />
+          </TouchableOpacity>
+        </View>
+      </View>
+      
       {/* Stories Grid */}
       {loading ? (
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading stories...</Text>
-        </View>
+        <LoadingSpinner message="Loading stories..." />
       ) : (
         <FlatList
           data={filteredStories}
@@ -275,6 +341,77 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
+  headerSection: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  headerTitle: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    textAlign: 'center',
+    marginBottom: 25,
+    textShadowColor: 'rgba(108, 92, 231, 0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  categoryButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 15,
+    marginBottom: 20,
+  },
+  categoryButton: {
+    paddingHorizontal: 28,
+    paddingVertical: 14,
+    borderRadius: 25,
+    backgroundColor: '#6c5ce7',
+    elevation: 6,
+    shadowColor: '#6c5ce7',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+  },
+  selectedCategoryButton: {
+    backgroundColor: '#ff6b35',
+    shadowColor: '#ff6b35',
+    transform: [{ scale: 1.05 }],
+  },
+  categoryButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  selectedCategoryButtonText: {
+    color: '#ffffff',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    gap: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  searchInput: {
+    flex: 1,
+    color: '#333333',
+    fontSize: 16,
+  },
+  micButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(108, 92, 231, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   storiesGrid: {
     paddingHorizontal: 15,
   },
@@ -284,11 +421,17 @@ const styles = StyleSheet.create({
   },
   storyCard: {
     width: (width - 45) / 2,
-    height: 250,
-    borderRadius: 15,
+    height: 300,
+    borderRadius: 25,
     overflow: 'hidden',
+    elevation: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    backgroundColor: '#ffffff',
   },
-  cardGradient: {
+  cardContainer: {
     flex: 1,
     position: 'relative',
   },
@@ -296,44 +439,49 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     position: 'absolute',
+    backgroundColor: '#f0f0f0',
   },
   storyOverlay: {
     flex: 1,
     justifyContent: 'space-between',
-    padding: 15,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    padding: 18,
+    background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.8) 100%)',
   },
   categoryBadge: {
     alignSelf: 'flex-start',
     backgroundColor: '#ff6b35',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+    shadowColor: '#ff6b35',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 4,
   },
   categoryText: {
     color: '#ffffff',
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
+  },
+  storyContent: {
+    gap: 8,
   },
   storyTitle: {
     color: '#ffffff',
     fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
+    fontWeight: '800',
+    lineHeight: 20,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   storyDate: {
     color: '#a0a9ff',
     fontSize: 12,
+    fontWeight: '500',
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    color: '#a0a9ff',
-    fontSize: 16,
-  },
+
   storyViewer: {
     flex: 1,
     backgroundColor: '#000000',
