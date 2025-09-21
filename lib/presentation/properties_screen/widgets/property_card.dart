@@ -29,18 +29,23 @@ class PropertyCard extends StatelessWidget {
 📊 Status: ${property.status}
 📝 Description: ${property.description.isNotEmpty ? property.description : 'N/A'}''';
 
-    final whatsappUrl = 'https://api.whatsapp.com/send/?phone=&text=${Uri.encodeComponent(message)}&type=phone_number&app_absent=0';
+    final whatsappUrl = 'https://wa.me/919586363303?text=${Uri.encodeComponent(message)}';
 
     try {
-      if (await canLaunchUrl(Uri.parse(whatsappUrl))) {
-        await launchUrl(
-          Uri.parse(whatsappUrl),
-          mode: LaunchMode.externalApplication,
-        );
-      }
+      await launchUrl(Uri.parse(whatsappUrl));
     } catch (e) {
       Logger.logError('Failed to launch WhatsApp', e);
       await Clipboard.setData(ClipboardData(text: message));
+    }
+  }
+
+  Future<void> _launchPhoneDialer() async {
+    final phoneUrl = 'tel:+919586363303';
+
+    try {
+      await launchUrl(Uri.parse(phoneUrl));
+    } catch (e) {
+      Logger.logError('Failed to launch phone dialer', e);
     }
   }
 
@@ -210,38 +215,69 @@ class PropertyCard extends StatelessWidget {
                   Positioned(
                     bottom: 2.h,
                     right: 3.w,
-                    child: Container(
-                      padding: EdgeInsets.all(2.w),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 8,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CustomIconWidget(
-                            iconName: 'chat',
-                            color: Color(0xFF25D366),
-                            size: 14,
-                          ),
-                          SizedBox(width: 1.w),
-                          Text(
-                            'WhatsApp',
-                            style: GoogleFonts.poppins(
-                              color: Color(0xFF25D366),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GestureDetector(
+                          onTap: () => _shareOnWhatsApp(),
+                          child: Container(
+                            padding: EdgeInsets.all(2.w),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CustomIconWidget(
+                                  iconName: 'chat',
+                                  color: Color(0xFF25D366),
+                                  size: 14,
+                                ),
+                                SizedBox(width: 1.w),
+                                Text(
+                                  'WhatsApp',
+                                  style: GoogleFonts.poppins(
+                                    color: Color(0xFF25D366),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        SizedBox(width: 2.w),
+                        GestureDetector(
+                          onTap: () => _launchPhoneDialer(),
+                          child: Container(
+                            padding: EdgeInsets.all(2.w),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: CustomIconWidget(
+                              iconName: 'phone',
+                              color: Color(0xFF2563EB),
+                              size: 14,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
