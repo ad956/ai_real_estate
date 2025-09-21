@@ -115,14 +115,7 @@ Calculated on ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().yea
           ),
           backgroundColor: Colors.transparent,
           elevation: 0,
-          leading: IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: CustomIconWidget(
-              iconName: 'arrow_back',
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
+          automaticallyImplyLeading: false,
           actions: [
             IconButton(
               onPressed: _shareEmiDetails,
@@ -284,6 +277,28 @@ Calculated on ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().yea
               ],
             ),
           ),
+        ),
+        bottomNavigationBar: SharedBottomNavbar(
+          currentIndex: 3,
+          onTap: (index) {
+            switch (index) {
+              case 0:
+                Navigator.pushReplacementNamed(context, AppRoutes.properties);
+                break;
+              case 1:
+                Navigator.pushReplacementNamed(context, AppRoutes.webStories);
+                break;
+              case 2:
+                Navigator.pushReplacementNamed(context, AppRoutes.blog);
+                break;
+              case 3:
+                // Already on EMI screen
+                break;
+              case 4:
+                Navigator.pushReplacementNamed(context, AppRoutes.profile);
+                break;
+            }
+          },
         ),
       ), // <-- This parenthesis closes Scaffold
     );
