@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
+
 import './widgets/blog_card.dart';
 import './widgets/blog_category_chip.dart';
 import './widgets/blog_empty_state.dart';
@@ -382,6 +383,7 @@ class _BlogScreenState extends State<BlogScreen> with TickerProviderStateMixin {
             ),
             backgroundColor: Colors.transparent,
             elevation: 0,
+            automaticallyImplyLeading: false,
             actions: [
               IconButton(
                 onPressed: () {},
@@ -402,7 +404,10 @@ class _BlogScreenState extends State<BlogScreen> with TickerProviderStateMixin {
                   controller: _searchController,
                   onChanged: _onSearchChanged,
                   onClear: _clearSearch,
+                  onTap: () {},
+                  onFilterTap: () {},
                 ),
+                SizedBox(height: 2.h),
                 Container(
                   height: 6.h,
                   child: ListView.builder(
@@ -468,6 +473,28 @@ class _BlogScreenState extends State<BlogScreen> with TickerProviderStateMixin {
                 ),
               ],
             ),
+          ),
+          bottomNavigationBar: SharedBottomNavbar(
+            currentIndex: 2,
+            onTap: (index) {
+              switch (index) {
+                case 0:
+                  Navigator.pushReplacementNamed(context, AppRoutes.properties);
+                  break;
+                case 1:
+                  Navigator.pushReplacementNamed(context, AppRoutes.webStories);
+                  break;
+                case 2:
+                  // Already on Blog screen
+                  break;
+                case 3:
+                  Navigator.pushReplacementNamed(context, AppRoutes.emiCalculator);
+                  break;
+                case 4:
+                  Navigator.pushReplacementNamed(context, AppRoutes.profile);
+                  break;
+              }
+            },
           ),
         ),
       ),

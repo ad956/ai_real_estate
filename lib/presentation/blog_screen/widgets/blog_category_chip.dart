@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/app_export.dart';
 import '../../../theme/app_theme.dart';
@@ -20,40 +21,30 @@ class BlogCategoryChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        margin: EdgeInsets.only(right: 3.w),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 200),
+        margin: EdgeInsets.only(right: 2.w),
         padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
         decoration: BoxDecoration(
-          gradient: isSelected
-              ? LinearGradient(
-                  colors: [AppTheme.accentDark, AppTheme.secondaryDark],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                )
-              : null,
-          color: isSelected ? null : Colors.white.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(25),
+          color: isSelected
+              ? Color(0xFF8B5CF6)
+              : Colors.white.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
-                ? Colors.transparent
+                ? Color(0xFF8B5CF6)
                 : Colors.white.withValues(alpha: 0.3),
             width: 1,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppTheme.accentDark.withValues(alpha: 0.4),
-                    blurRadius: 12,
-                    offset: Offset(0, 4),
-                  ),
-                ]
-              : null,
         ),
-        child: Text(
-          category,
-          style: AppTheme.lightTheme.textTheme.labelMedium?.copyWith(
-            color: Colors.white,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+        child: Center(
+          child: Text(
+            category,
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+            ),
           ),
         ),
       ),

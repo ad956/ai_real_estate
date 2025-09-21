@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/app_export.dart';
 
@@ -23,13 +24,24 @@ class BlogCard extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
         decoration: BoxDecoration(
-          color: AppTheme.lightTheme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
+          gradient: LinearGradient(
+            colors: [
+              Colors.white.withValues(alpha: 0.15),
+              Colors.white.withValues(alpha: 0.05),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.2),
+            width: 1,
+          ),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.lightTheme.colorScheme.shadow,
-              blurRadius: 8,
-              offset: Offset(0, 2),
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 15,
+              offset: Offset(0, 8),
             ),
           ],
         ),
@@ -38,12 +50,53 @@ class BlogCard extends StatelessWidget {
           children: [
             // Featured Image
             ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-              child: CustomImageWidget(
-                imageUrl: blog["featuredImage"] as String? ?? "",
-                width: double.infinity,
-                height: 25.h,
-                fit: BoxFit.cover,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              child: Stack(
+                children: [
+                  CustomImageWidget(
+                    imageUrl: blog["featuredImage"] as String? ?? "",
+                    width: double.infinity,
+                    height: 22.h,
+                    fit: BoxFit.cover,
+                  ),
+                  Container(
+                    width: double.infinity,
+                    height: 22.h,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.3),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 2.h,
+                    right: 3.w,
+                    child: Container(
+                      padding: EdgeInsets.all(2.w),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.bookmark_border,
+                        color: AppTheme.primaryDark,
+                        size: 4.w,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
 
@@ -55,20 +108,29 @@ class BlogCard extends StatelessWidget {
                   // Category Tag
                   Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: 2.w,
-                      vertical: 0.5.h,
+                      horizontal: 3.w,
+                      vertical: 1.h,
                     ),
                     decoration: BoxDecoration(
-                      color: AppTheme.lightTheme.primaryColor.withValues(
-                        alpha: 0.1,
+                      gradient: LinearGradient(
+                        colors: [AppTheme.accentDark, AppTheme.primaryDark],
                       ),
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.accentDark.withValues(alpha: 0.4),
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Text(
                       blog["category"] as String? ?? "General",
-                      style: AppTheme.lightTheme.textTheme.labelSmall?.copyWith(
-                        color: AppTheme.lightTheme.primaryColor,
-                        fontWeight: FontWeight.w600,
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
                       ),
                     ),
                   ),
@@ -78,8 +140,10 @@ class BlogCard extends StatelessWidget {
                   // Headline
                   Text(
                     blog["headline"] as String? ?? "No Title",
-                    style: AppTheme.lightTheme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
                       height: 1.3,
                     ),
                     maxLines: 2,
@@ -91,8 +155,10 @@ class BlogCard extends StatelessWidget {
                   // Excerpt
                   Text(
                     blog["excerpt"] as String? ?? "No description available",
-                    style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
-                      color: AppTheme.lightTheme.colorScheme.onSurfaceVariant,
+                    style: GoogleFonts.poppins(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
                       height: 1.4,
                     ),
                     maxLines: 3,
@@ -104,32 +170,35 @@ class BlogCard extends StatelessWidget {
                   // Publication Date and Read Time
                   Row(
                     children: [
-                      CustomIconWidget(
-                        iconName: 'schedule',
-                        color: AppTheme.lightTheme.colorScheme.onSurfaceVariant,
-                        size: 16,
+                      Icon(
+                        Icons.access_time,
+                        color: Colors.white.withValues(alpha: 0.7),
+                        size: 14,
                       ),
                       SizedBox(width: 1.w),
                       Text(
                         blog["publishedDate"] as String? ?? "Unknown",
-                        style: AppTheme.lightTheme.textTheme.labelSmall
-                            ?.copyWith(
-                              color: AppTheme
-                                  .lightTheme
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
+                        style: GoogleFonts.poppins(
+                          color: Colors.white.withValues(alpha: 0.7),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       Spacer(),
-                      Text(
-                        "${blog["readTime"] ?? 5} min read",
-                        style: AppTheme.lightTheme.textTheme.labelSmall
-                            ?.copyWith(
-                              color: AppTheme
-                                  .lightTheme
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.5.h),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          "${blog["readTime"] ?? 5} min read",
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ],
                   ),
