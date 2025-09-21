@@ -1,3 +1,17 @@
+# AI In Real Estate 🏠
+
+A modern Flutter application for real estate property browsing with AI-powered features, EMI calculator, web stories, and comprehensive property management.
+
+## ✨ Features
+
+- 🏠 **Property Browsing** - Browse properties by categories (New Launch, Ready to Move, Under Construction)
+- 📱 **Direct Contact** - WhatsApp and phone integration for instant property inquiries
+- 🧮 **EMI Calculator** - Calculate loan EMIs with interactive sliders and visual breakdowns
+- 📖 **Web Stories** - Engaging property stories and market insights
+- 📝 **Real Estate Blog** - Latest news, tips, and market analysis
+- 🌙 **Dark Theme** - Beautiful gradient-based dark theme design
+- 📍 **Location-based** - Properties in Vadodara with detailed location info
+
 ## 📋 Prerequisites
 
 - Flutter SDK (^3.29.2)
@@ -7,12 +21,18 @@
 
 ## 🛠️ Installation
 
-1. Install dependencies:
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd ai_in_real_estate
+```
+
+2. Install dependencies:
 ```bash
 flutter pub get
 ```
 
-2. Run the application:
+3. Run the application:
 ```bash
 flutter run
 ```
@@ -20,82 +40,74 @@ flutter run
 ## 📁 Project Structure
 
 ```
-flutter_app/
-├── android/            # Android-specific configuration
-├── ios/                # iOS-specific configuration
+ai_in_real_estate/
 ├── lib/
-│   ├── core/           # Core utilities and services
-│   │   └── utils/      # Utility classes
-│   ├── presentation/   # UI screens and widgets
-│   │   └── splash_screen/ # Splash screen implementation
-│   ├── routes/         # Application routing
-│   ├── theme/          # Theme configuration
-│   ├── widgets/        # Reusable UI components
-│   └── main.dart       # Application entry point
-├── assets/             # Static assets (images, fonts, etc.)
-├── pubspec.yaml        # Project dependencies and configuration
-└── README.md           # Project documentation
+│   ├── core/
+│   │   ├── constants/     # Mock data and constants
+│   │   └── utils/         # Logger and connectivity services
+│   ├── models/            # Data models (Property, WebStory)
+│   ├── presentation/      # UI screens and widgets
+│   │   ├── properties_screen/    # Property listing
+│   │   ├── property_details_screen/ # Property details
+│   │   ├── emi_calculator_screen/  # EMI calculator
+│   │   ├── web_stories_screen/     # Web stories
+│   │   ├── blog_screen/            # Blog articles
+│   │   └── splash_screen/          # App splash
+│   ├── services/          # API services
+│   ├── theme/             # App theming
+│   ├── widgets/           # Reusable components
+│   └── routes/            # Navigation routes
+├── assets/                # Images and static assets
+└── pubspec.yaml          # Dependencies
 ```
 
-## 🧩 Adding Routes
+## 🎨 Key Features
 
-To add new routes to the application, update the `lib/routes/app_routes.dart` file:
+### Property Management
+- Category-based property browsing
+- Detailed property information with image galleries
+- Direct WhatsApp (+919586363303) and phone contact
+- Property filtering and search
 
+### EMI Calculator
+- Interactive loan amount, interest rate, and tenure sliders
+- Visual pie chart breakdown of principal vs interest
+- Detailed repayment schedule table
+- Responsive calculations with real-time updates
+
+### Modern UI/UX
+- Dark gradient theme with purple/blue color scheme
+- Responsive design using Sizer package
+- Smooth animations and haptic feedback
+- Custom shimmer loading states
+
+## 🔧 Configuration
+
+### API Integration
+Toggle between mock data and real API in `lib/core/constants/mock_data.dart`:
 ```dart
-import 'package:flutter/material.dart';
-import 'package:package_name/presentation/home_screen/home_screen.dart';
-
-class AppRoutes {
-  static const String initial = '/';
-  static const String home = '/home';
-
-  static Map<String, WidgetBuilder> routes = {
-    initial: (context) => const SplashScreen(),
-    home: (context) => const HomeScreen(),
-    // Add more routes as needed
-  }
-}
+static const bool USE_REAL_API = false; // Set to true for live API
 ```
 
-## 🎨 Theming
+## 📦 Dependencies
 
-This project includes a comprehensive theming system with both light and dark themes:
+- `sizer` - Responsive design
+- `google_fonts` - Typography
+- `cached_network_image` - Image caching
+- `url_launcher` - External app integration
+- `connectivity_plus` - Network status
+- `dio` - HTTP client
+- `fl_chart` - Charts and graphs
 
-```dart
-// Access the current theme
-ThemeData theme = Theme.of(context);
-
-// Use theme colors
-Color primaryColor = theme.colorScheme.primary;
-```
-
-The theme configuration includes:
-- Color schemes for light and dark modes
-- Typography styles
-- Button themes
-- Input decoration themes
-- Card and dialog themes
-
-## 📱 Responsive Design
-
-The app is built with responsive design using the Sizer package:
-
-```dart
-// Example of responsive sizing
-Container(
-  width: 50.w, // 50% of screen width
-  height: 20.h, // 20% of screen height
-  child: Text('Responsive Container'),
-)
-```
-## 📦 Deployment
-
-Build the application for production:
+## 🚀 Deployment
 
 ```bash
-# For Android
+# Android APK
 flutter build apk --release
 
-# For iOS
+# Android App Bundle
+flutter build appbundle --release
+
+# iOS
 flutter build ios --release
 ```
