@@ -294,9 +294,6 @@ Calculated on ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().yea
               case 3:
                 // Already on EMI screen
                 break;
-              case 4:
-                Navigator.pushReplacementNamed(context, AppRoutes.profile);
-                break;
             }
           },
         ),

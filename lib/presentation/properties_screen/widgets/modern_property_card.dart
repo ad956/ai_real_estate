@@ -408,16 +408,19 @@ class ModernPropertyCard extends StatelessWidget {
           ),
         ),
         SizedBox(width: 2.w),
-        Container(
-          padding: EdgeInsets.all(1.2.h),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: CustomIconWidget(
-            iconName: 'phone',
-            color: Colors.white,
-            size: 14,
+        GestureDetector(
+          onTap: () => _launchPhoneDialer(),
+          child: Container(
+            padding: EdgeInsets.all(1.2.h),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: CustomIconWidget(
+              iconName: 'phone',
+              color: Colors.white,
+              size: 14,
+            ),
           ),
         ),
         SizedBox(width: 1.w),
@@ -448,14 +451,22 @@ class ModernPropertyCard extends StatelessWidget {
 📊 Status: ${property.status}
 📝 Description: ${property.description.isNotEmpty ? property.description : 'N/A'}''';
     
-    final url = 'https://api.whatsapp.com/send/?phone=&text=${Uri.encodeComponent(message)}&type=phone_number&app_absent=0';
+    final url = 'https://wa.me/919586363303?text=${Uri.encodeComponent(message)}';
     
     try {
-      if (await canLaunchUrl(Uri.parse(url))) {
-        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-      }
+      await launchUrl(Uri.parse(url));
     } catch (e) {
       Logger.logError('Failed to launch WhatsApp', e);
+    }
+  }
+
+  void _launchPhoneDialer() async {
+    final url = 'tel:+919586363303';
+    
+    try {
+      await launchUrl(Uri.parse(url));
+    } catch (e) {
+      Logger.logError('Failed to launch phone dialer', e);
     }
   }
 

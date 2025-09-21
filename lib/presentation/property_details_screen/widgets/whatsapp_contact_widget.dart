@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sizer/sizer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/app_export.dart';
 
@@ -84,47 +85,51 @@ class WhatsAppContactWidget extends StatelessWidget {
     );
   }
 
-  void _contactViaWhatsApp() {
+  void _contactViaWhatsApp() async {
     final propertyTitle = property["title"] as String? ?? "Property";
     final propertyPrice = property["price"] as String? ?? "Price not available";
-    final propertyLocation =
-        property["location"] as String? ?? "Location not available";
-    final propertyType =
-        property["type"] as String? ?? "Property type not available";
+    final propertyLocation = property["location"] as String? ?? "Location not available";
+    final propertyType = property["type"] as String? ?? "Property type not available";
 
-    final message =
-        """
-Hi! I'm interested in this property:
+    final message = Uri.encodeComponent(
+        "Hi! I'm interested in this property:\n\n🏠 *${propertyTitle}*\n💰 Price: ${propertyPrice}\n📍 Location: ${propertyLocation}\n🏢 Type: ${propertyType}\n\nCould you please provide more details and arrange a viewing?\n\nThank you!");
 
-🏠 *${propertyTitle}*
-💰 Price: ${propertyPrice}
-📍 Location: ${propertyLocation}
-🏢 Type: ${propertyType}
+    final whatsappUrl = "https://api.whatsapp.com/send/?phone=919586363303&text=${message}&type=phone_number&app_absent=0";
 
-Could you please provide more details and arrange a viewing?
-
-Thank you!
-""";
-
-    // In a real app, this would open WhatsApp with the pre-filled message
-    // For now, we'll show a toast with the message
-    Fluttertoast.showToast(
-      msg: "WhatsApp message prepared: ${message.substring(0, 50)}...",
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Color(0xFF25D366),
-      textColor: Colors.white,
-    );
+    try {
+      if (await canLaunchUrl(Uri.parse(whatsappUrl))) {
+        await launchUrl(Uri.parse(whatsappUrl), mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not launch WhatsApp';
+      }
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Could not open WhatsApp",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
   }
 
-  void _callAgent() {
-    // In a real app, this would initiate a phone call
-    Fluttertoast.showToast(
-      msg: "Calling agent: +91 98765 43210",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: AppTheme.lightTheme.primaryColor,
-      textColor: Colors.white,
-    );
+  void _callAgent() async {
+    final phoneUrl = "tel:+919586363303";
+
+    try {
+      if (await canLaunchUrl(Uri.parse(phoneUrl))) {
+        await launchUrl(Uri.parse(phoneUrl));
+      } else {
+        throw 'Could not launch phone dialer';
+      }
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Could not make call",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
   }
 }

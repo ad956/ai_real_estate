@@ -184,9 +184,6 @@ class _WebStoriesScreenState extends State<WebStoriesScreen>
       case 3:
         Navigator.pushReplacementNamed(context, AppRoutes.emiCalculator);
         break;
-      case 4:
-        Navigator.pushReplacementNamed(context, '/profile-screen');
-        break;
     }
   }
 

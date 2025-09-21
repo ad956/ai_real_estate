@@ -44,7 +44,6 @@ class SharedBottomNavbar extends StatelessWidget {
             _buildNavItem(1, Icons.auto_stories, Icons.auto_stories_outlined, 'Stories'),
             _buildNavItem(2, Icons.article, Icons.article_outlined, 'Blog'),
             _buildNavItem(3, Icons.calculate, Icons.calculate_outlined, 'EMI'),
-            _buildNavItem(4, Icons.person, Icons.person_outline, 'Profile'),
           ],
         ),
       ),

@@ -490,9 +490,6 @@ class _BlogScreenState extends State<BlogScreen> with TickerProviderStateMixin {
                 case 3:
                   Navigator.pushReplacementNamed(context, AppRoutes.emiCalculator);
                   break;
-                case 4:
-                  Navigator.pushReplacementNamed(context, AppRoutes.profile);
-                  break;
               }
             },
           ),
