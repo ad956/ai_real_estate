@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../core/app_export.dart';
 
 class StoryViewerWidget extends StatefulWidget {
-  final List<Map<String, dynamic>> stories;
+  final List<WebStory> stories;
   final int initialIndex;
   final VoidCallback onClose;
 
@@ -133,11 +133,14 @@ class _StoryViewerWidgetState extends State<StoryViewerWidget>
               itemCount: widget.stories.length,
               itemBuilder: (context, index) {
                 final story = widget.stories[index];
+                final imageUrl = story.details.isNotEmpty 
+                    ? story.details.first.fullImageUrl
+                    : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=600&fit=crop';
                 return Container(
                   width: double.infinity,
                   height: double.infinity,
                   child: CustomImageWidget(
-                    imageUrl: story['imageUrl'] ?? '',
+                    imageUrl: imageUrl,
                     width: double.infinity,
                     height: double.infinity,
                     fit: BoxFit.cover,
@@ -238,7 +241,7 @@ class _StoryViewerWidgetState extends State<StoryViewerWidget>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.stories[_currentIndex]['title'] ?? 'Story',
+                              widget.stories[_currentIndex].title,
                               style: AppTheme.lightTheme.textTheme.titleMedium
                                   ?.copyWith(
                                     color: Colors.white,
@@ -249,8 +252,7 @@ class _StoryViewerWidgetState extends State<StoryViewerWidget>
                             ),
                             SizedBox(height: 4),
                             Text(
-                              widget.stories[_currentIndex]['category'] ??
-                                  'Real Estate',
+                              'Real Estate Story',
                               style: AppTheme.lightTheme.textTheme.bodySmall
                                   ?.copyWith(
                                     color: Colors.white.withValues(alpha: 0.8),

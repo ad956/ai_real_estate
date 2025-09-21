@@ -4,7 +4,7 @@ import 'package:sizer/sizer.dart';
 import '../../../core/app_export.dart';
 
 class PropertyInfoWidget extends StatelessWidget {
-  final Map<String, dynamic> property;
+  final Property? property;
 
   const PropertyInfoWidget({Key? key, required this.property})
     : super(key: key);
@@ -17,19 +17,86 @@ class PropertyInfoWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildPriceSection(),
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.5.h),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryDark,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  property?.propertyType ?? 'Property',
+                  style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Spacer(),
+              Row(
+                children: [
+                  Icon(Icons.star, color: Colors.orange, size: 4.w),
+                  SizedBox(width: 1.w),
+                  Text(
+                    '4.5 (365 reviews)',
+                    style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
           SizedBox(height: 2.h),
           _buildTitleSection(),
           SizedBox(height: 1.h),
           _buildLocationSection(),
+          SizedBox(height: 3.h),
+          Row(
+            children: [
+              Text(
+                'About',
+                style: AppTheme.lightTheme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.primaryDark,
+                ),
+              ),
+              SizedBox(width: 6.w),
+              Text(
+                'Gallery',
+                style: AppTheme.lightTheme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey[600],
+                ),
+              ),
+              SizedBox(width: 6.w),
+              Text(
+                'Review',
+                style: AppTheme.lightTheme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
           SizedBox(height: 2.h),
-          _buildStatusBadge(),
+          Container(
+            height: 2,
+            width: 12.w,
+            decoration: BoxDecoration(
+              color: AppTheme.primaryDark,
+              borderRadius: BorderRadius.circular(1),
+            ),
+          ),
           SizedBox(height: 3.h),
           _buildSpecificationsSection(),
           SizedBox(height: 3.h),
           _buildDescriptionSection(),
           SizedBox(height: 3.h),
-          _buildAmenitiesSection(),
+          _buildListingAgent(),
+          SizedBox(height: 3.h),
+          _buildPriceSection(),
         ],
       ),
     );
@@ -39,14 +106,14 @@ class PropertyInfoWidget extends StatelessWidget {
     return Row(
       children: [
         Text(
-          property["price"] as String? ?? "₹0",
+          property?.formattedPrice ?? "₹0",
           style: AppTheme.lightTheme.textTheme.headlineMedium?.copyWith(
             color: AppTheme.lightTheme.primaryColor,
             fontWeight: FontWeight.w700,
           ),
         ),
         SizedBox(width: 2.w),
-        if (property["priceType"] != null)
+        if (property?.status.isNotEmpty == true)
           Container(
             padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.5.h),
             decoration: BoxDecoration(
@@ -54,7 +121,7 @@ class PropertyInfoWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(1.h),
             ),
             child: Text(
-              property["priceType"] as String,
+              property!.status,
               style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
                 color: AppTheme.lightTheme.primaryColor,
                 fontWeight: FontWeight.w500,
@@ -67,7 +134,7 @@ class PropertyInfoWidget extends StatelessWidget {
 
   Widget _buildTitleSection() {
     return Text(
-      property["title"] as String? ?? "Property Title",
+      property?.title ?? "Property Title",
       style: AppTheme.lightTheme.textTheme.titleLarge?.copyWith(
         fontWeight: FontWeight.w600,
       ),
@@ -85,7 +152,7 @@ class PropertyInfoWidget extends StatelessWidget {
         SizedBox(width: 1.w),
         Expanded(
           child: Text(
-            "${property["location"] as String? ?? "Location"} - ${property["pinCode"] as String? ?? "000000"}",
+            "${property?.fullLocation ?? "Location"} - ${property?.pinCode ?? "000000"}",
             style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
               color: AppTheme.lightTheme.colorScheme.onSurfaceVariant,
             ),
@@ -96,7 +163,7 @@ class PropertyInfoWidget extends StatelessWidget {
   }
 
   Widget _buildStatusBadge() {
-    final status = property["status"] as String? ?? "Available";
+    final status = property?.status ?? "Available";
     Color statusColor;
 
     switch (status.toLowerCase()) {
@@ -131,147 +198,149 @@ class PropertyInfoWidget extends StatelessWidget {
   }
 
   Widget _buildSpecificationsSection() {
-    final specs = property["specifications"] as Map<String, dynamic>? ?? {};
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        Text(
-          "Property Details",
-          style: AppTheme.lightTheme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
+        if (property?.bedrooms.isNotEmpty == true)
+          _buildSpecItem(
+            "${property!.bedrooms} Beds",
+            Icons.bed,
           ),
-        ),
-        SizedBox(height: 1.5.h),
-        Wrap(
-          spacing: 4.w,
-          runSpacing: 2.h,
-          children: [
-            _buildSpecItem(
-              "Bedrooms",
-              specs["bedrooms"]?.toString() ?? "N/A",
-              'bed',
-            ),
-            _buildSpecItem(
-              "Bathrooms",
-              specs["bathrooms"]?.toString() ?? "N/A",
-              'bathtub',
-            ),
-            _buildSpecItem(
-              "Area",
-              specs["area"]?.toString() ?? "N/A",
-              'square_foot',
-            ),
-            _buildSpecItem(
-              "Type",
-              property["type"]?.toString() ?? "N/A",
-              'home',
-            ),
-            _buildSpecItem(
-              "Parking",
-              specs["parking"]?.toString() ?? "N/A",
-              'local_parking',
-            ),
-            _buildSpecItem(
-              "Floor",
-              specs["floor"]?.toString() ?? "N/A",
-              'layers',
-            ),
-          ],
-        ),
+        if (property?.bedrooms.isNotEmpty == true) SizedBox(width: 6.w),
+        if (property?.bathrooms.isNotEmpty == true)
+          _buildSpecItem(
+            "${property!.bathrooms} Bath",
+            Icons.bathtub,
+          ),
+        if (property?.bathrooms.isNotEmpty == true) SizedBox(width: 6.w),
+        if (property?.areaSqft.isNotEmpty == true)
+          _buildSpecItem(
+            "${property!.areaSqft} sqft",
+            Icons.square_foot,
+          ),
       ],
     );
   }
 
-  Widget _buildSpecItem(String label, String value, String iconName) {
-    return Container(
-      width: 40.w,
-      child: Row(
-        children: [
-          Container(
-            width: 8.w,
-            height: 8.w,
-            decoration: BoxDecoration(
-              color: AppTheme.lightTheme.primaryColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(2.w),
-            ),
-            child: CustomIconWidget(
-              iconName: iconName,
-              color: AppTheme.lightTheme.primaryColor,
-              size: 4.w,
-            ),
+  Widget _buildSpecItem(String label, IconData icon) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          color: AppTheme.primaryDark,
+          size: 5.w,
+        ),
+        SizedBox(width: 1.w),
+        Text(
+          label,
+          style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w500,
+            color: Colors.grey[700],
           ),
-          SizedBox(width: 2.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
-                    color: AppTheme.lightTheme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                Text(
-                  value,
-                  style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildDescriptionSection() {
-    final description = property["description"] as String? ?? "";
-
-    if (description.isEmpty) return SizedBox.shrink();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Description",
+          'Description',
           style: AppTheme.lightTheme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
-        SizedBox(height: 1.5.h),
+        SizedBox(height: 1.h),
         Text(
-          description,
+          property?.description.isNotEmpty == true 
+              ? property!.description 
+              : 'No description available for this property.',
           style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
             height: 1.5,
+            color: Colors.grey[600],
+          ),
+        ),
+        SizedBox(height: 1.h),
+        Text(
+          'Read more',
+          style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
+            color: AppTheme.primaryDark,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildAmenitiesSection() {
-    final amenities = (property["amenities"] as List?)?.cast<String>() ?? [];
-
-    if (amenities.isEmpty) return SizedBox.shrink();
-
+  Widget _buildListingAgent() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Amenities",
+          'Listing Agent',
           style: AppTheme.lightTheme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
-        SizedBox(height: 1.5.h),
-        Wrap(
-          spacing: 2.w,
-          runSpacing: 1.h,
-          children: amenities
-              .map((amenity) => _buildAmenityChip(amenity))
-              .toList(),
+        SizedBox(height: 2.h),
+        Row(
+          children: [
+            CircleAvatar(
+              radius: 6.w,
+              backgroundColor: Colors.grey[300],
+              child: Icon(
+                Icons.person,
+                color: Colors.grey[600],
+                size: 6.w,
+              ),
+            ),
+            SizedBox(width: 3.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    property?.postedBy.isNotEmpty == true ? property!.postedBy : 'Property Owner',
+                    style: AppTheme.lightTheme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    'Posted by ${property?.postedBy ?? 'Owner'}',
+                    style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(2.w),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryDark,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.chat,
+                color: Colors.white,
+                size: 4.w,
+              ),
+            ),
+            SizedBox(width: 2.w),
+            Container(
+              padding: EdgeInsets.all(2.w),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryDark,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.phone,
+                color: Colors.white,
+                size: 4.w,
+              ),
+            ),
+          ],
         ),
       ],
     );

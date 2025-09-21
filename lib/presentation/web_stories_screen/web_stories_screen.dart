@@ -4,6 +4,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
 import '../../services/api_service.dart';
+import '../../widgets/shared_bottom_navbar.dart';
 import './widgets/category_chips_widget.dart';
 import './widgets/shimmer_loading_widget.dart';
 import './widgets/story_thumbnail_widget.dart';
@@ -20,8 +21,9 @@ class _WebStoriesScreenState extends State<WebStoriesScreen>
     with AutomaticKeepAliveClientMixin {
   bool _isLoading = true;
   String _selectedCategory = 'All';
-  List<Map<String, dynamic>> _stories = [];
-  List<Map<String, dynamic>> _filteredStories = [];
+  List<WebStory> _stories = [];
+  List<WebStory> _filteredStories = [];
+  int _currentBottomNavIndex = 1;
 
   final List<String> _categories = [
     'All',
@@ -32,89 +34,7 @@ class _WebStoriesScreenState extends State<WebStoriesScreen>
     'Price Trends',
   ];
 
-  // Mock data for web stories
-  final List<Map<String, dynamic>> _mockStories = [
-    {
-      "id": 1,
-      "title": "Luxury Apartments in Mumbai - New Launch",
-      "category": "New Launches",
-      "duration": "1:45",
-      "imageUrl":
-          "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=600&fit=crop",
-      "isRead": false,
-      "createdAt": "2025-01-20T10:30:00Z",
-    },
-    {
-      "id": 2,
-      "title": "Real Estate Market Trends 2025",
-      "category": "Market Updates",
-      "duration": "2:15",
-      "imageUrl":
-          "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=600&fit=crop",
-      "isRead": true,
-      "createdAt": "2025-01-19T15:20:00Z",
-    },
-    {
-      "id": 3,
-      "title": "Smart Investment Strategies for Properties",
-      "category": "Investment Tips",
-      "duration": "3:00",
-      "imageUrl":
-          "https://images.unsplash.com/photo-1554469384-e58fac16e23a?w=400&h=600&fit=crop",
-      "isRead": false,
-      "createdAt": "2025-01-19T09:45:00Z",
-    },
-    {
-      "id": 4,
-      "title": "Virtual Tour: 3BHK Premium Villa",
-      "category": "Property Tours",
-      "duration": "4:30",
-      "imageUrl":
-          "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=600&fit=crop",
-      "isRead": false,
-      "createdAt": "2025-01-18T14:10:00Z",
-    },
-    {
-      "id": 5,
-      "title": "Price Analysis: Bangalore vs Mumbai",
-      "category": "Price Trends",
-      "duration": "2:45",
-      "imageUrl":
-          "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=600&fit=crop",
-      "isRead": true,
-      "createdAt": "2025-01-18T11:30:00Z",
-    },
-    {
-      "id": 6,
-      "title": "Commercial Spaces: Office Investment Guide",
-      "category": "Investment Tips",
-      "duration": "3:20",
-      "imageUrl":
-          "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=600&fit=crop",
-      "isRead": false,
-      "createdAt": "2025-01-17T16:45:00Z",
-    },
-    {
-      "id": 7,
-      "title": "Upcoming Projects in Pune",
-      "category": "New Launches",
-      "duration": "2:00",
-      "imageUrl":
-          "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=600&fit=crop",
-      "isRead": false,
-      "createdAt": "2025-01-17T08:20:00Z",
-    },
-    {
-      "id": 8,
-      "title": "Market Outlook: Q1 2025 Predictions",
-      "category": "Market Updates",
-      "duration": "1:55",
-      "imageUrl":
-          "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=600&fit=crop",
-      "isRead": false,
-      "createdAt": "2025-01-16T13:15:00Z",
-    },
-  ];
+
 
   @override
   bool get wantKeepAlive => true;
@@ -133,22 +53,12 @@ class _WebStoriesScreenState extends State<WebStoriesScreen>
     try {
       final data = await ApiService.getWebStories();
       if (data['success'] == true) {
-        final stories = <Map<String, dynamic>>[];
-        for (var story in data['webstories']) {
-          stories.add({
-            'id': story['id'],
-            'title': story['title'] ?? 'Story',
-            'category': 'Real Estate',
-            'duration': '2:00',
-            'imageUrl': story['details']?.isNotEmpty == true 
-              ? 'https://aiinrealestate.in${story['details'][0]['img']}'
-              : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=600&fit=crop',
-            'isRead': false,
-            'createdAt': story['date'] ?? DateTime.now().toIso8601String(),
-          });
-        }
+        final stories = (data['webstories'] as List)
+            .map((storyJson) => WebStory.fromJson(storyJson))
+            .toList();
+        
         setState(() {
-          _stories = stories.isEmpty ? _mockStories : stories;
+          _stories = stories;
           _filteredStories = List.from(_stories);
           _isLoading = false;
         });
@@ -157,8 +67,8 @@ class _WebStoriesScreenState extends State<WebStoriesScreen>
       }
     } catch (e) {
       setState(() {
-        _stories = List.from(_mockStories);
-        _filteredStories = List.from(_stories);
+        _stories = [];
+        _filteredStories = [];
         _isLoading = false;
       });
     }
@@ -167,29 +77,14 @@ class _WebStoriesScreenState extends State<WebStoriesScreen>
   void _filterStoriesByCategory(String category) {
     setState(() {
       _selectedCategory = category;
-      if (category == 'All') {
-        _filteredStories = List.from(_stories);
-      } else {
-        _filteredStories = _stories
-            .where((story) => (story['category'] as String) == category)
-            .toList();
-      }
+      _filteredStories = List.from(_stories);
     });
   }
 
   void _openStoryViewer(int index) {
     HapticFeedback.mediumImpact();
 
-    // Mark story as read
-    setState(() {
-      _filteredStories[index]['isRead'] = true;
-      // Update in main stories list as well
-      final storyId = _filteredStories[index]['id'];
-      final mainIndex = _stories.indexWhere((story) => story['id'] == storyId);
-      if (mainIndex != -1) {
-        _stories[mainIndex]['isRead'] = true;
-      }
-    });
+    // Mark story as read - implementation would go here
 
     Navigator.of(context).push(
       PageRouteBuilder(
@@ -273,6 +168,28 @@ class _WebStoriesScreenState extends State<WebStoriesScreen>
     await _loadStories();
   }
 
+  void _onBottomNavTap(int index) {
+    if (index == _currentBottomNavIndex) return;
+
+    switch (index) {
+      case 0:
+        Navigator.pushReplacementNamed(context, AppRoutes.properties);
+        break;
+      case 1:
+        // Already on Stories screen
+        break;
+      case 2:
+        Navigator.pushReplacementNamed(context, AppRoutes.blog);
+        break;
+      case 3:
+        Navigator.pushReplacementNamed(context, AppRoutes.emiCalculator);
+        break;
+      case 4:
+        Navigator.pushReplacementNamed(context, '/profile-screen');
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -304,6 +221,7 @@ class _WebStoriesScreenState extends State<WebStoriesScreen>
             ),
             backgroundColor: Colors.transparent,
             elevation: 0,
+            automaticallyImplyLeading: false,
             actions: [
               IconButton(
                 onPressed: () {},
@@ -332,13 +250,13 @@ class _WebStoriesScreenState extends State<WebStoriesScreen>
                         child: _filteredStories.isEmpty
                             ? _buildEmptyState()
                             : GridView.builder(
-                                padding: EdgeInsets.symmetric(horizontal: 4.w),
+                                padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
                                 gridDelegate:
                                     SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 2,
-                                      crossAxisSpacing: 3.w,
-                                      mainAxisSpacing: 3.w,
-                                      childAspectRatio: 0.75,
+                                      crossAxisSpacing: 4.w,
+                                      mainAxisSpacing: 4.w,
+                                      childAspectRatio: 0.65,
                                     ),
                                 itemCount: _filteredStories.length,
                                 itemBuilder: (context, index) {
@@ -352,6 +270,10 @@ class _WebStoriesScreenState extends State<WebStoriesScreen>
                       ),
               ),
             ],
+          ),
+          bottomNavigationBar: SharedBottomNavbar(
+            currentIndex: _currentBottomNavIndex,
+            onTap: _onBottomNavTap,
           ),
         ),
       ),
