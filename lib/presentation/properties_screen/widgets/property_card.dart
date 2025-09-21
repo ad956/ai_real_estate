@@ -5,12 +5,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/app_export.dart';
-import '../../../theme/app_theme.dart';
-import '../../../widgets/custom_icon_widget.dart';
-import '../../../widgets/custom_image_widget.dart';
 
 class PropertyCard extends StatelessWidget {
-  final Map<String, dynamic> property;
+  final Property property;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
 
@@ -22,25 +19,17 @@ class PropertyCard extends StatelessWidget {
   }) : super(key: key);
 
   Future<void> _shareOnWhatsApp() async {
-    final propertyTitle = property['title'] ?? 'Property';
-    final propertyPrice = property['price'] ?? 'Price on request';
-    final propertyLocation = property['location'] ?? 'Location not specified';
-    final propertyType = property['type'] ?? 'Property';
+    final message = '''🏠 Property Details:
 
-    final message =
-        '''
-🏠 *${propertyTitle}*
+🏷️ Title: ${property.title}
+💰 Price: ${property.formattedPrice}
+📍 Location: ${property.fullLocation}
+📮 Pin Code: ${property.pinCode.isNotEmpty ? property.pinCode : 'N/A'}
+🏢 Type: ${property.propertyType}
+📊 Status: ${property.status}
+📝 Description: ${property.description.isNotEmpty ? property.description : 'N/A'}''';
 
-💰 Price: ${propertyPrice}
-📍 Location: ${propertyLocation}
-🏢 Type: ${propertyType}
-
-I'm interested in this property. Could you please provide more details?
-
-Sent from RealEstate Pro App
-''';
-
-    final whatsappUrl = 'https://wa.me/?text=${Uri.encodeComponent(message)}';
+    final whatsappUrl = 'https://api.whatsapp.com/send/?phone=&text=${Uri.encodeComponent(message)}&type=phone_number&app_absent=0';
 
     try {
       if (await canLaunchUrl(Uri.parse(whatsappUrl))) {
@@ -50,7 +39,7 @@ Sent from RealEstate Pro App
         );
       }
     } catch (e) {
-      // Fallback - copy to clipboard
+      Logger.logError('Failed to launch WhatsApp', e);
       await Clipboard.setData(ClipboardData(text: message));
     }
   }
@@ -123,15 +112,6 @@ Sent from RealEstate Pro App
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl =
-        property['image'] ??
-        'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop';
-    final title = property['title'] ?? 'Property Title';
-    final price = property['price'] ?? '₹0';
-    final location = property['location'] ?? 'Location';
-    final status = property['status'] ?? 'Available';
-    final pinCode = property['pinCode'] ?? '000000';
-    final type = property['type'] ?? 'Residential';
 
     return GestureDetector(
       onTap: () {
@@ -170,7 +150,7 @@ Sent from RealEstate Pro App
               child: Stack(
                 children: [
                   CustomImageWidget(
-                    imageUrl: imageUrl,
+                    imageUrl: property.primaryImage,
                     width: double.infinity,
                     height: 25.h,
                     fit: BoxFit.cover,
@@ -199,11 +179,11 @@ Sent from RealEstate Pro App
                       ),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: status.toLowerCase() == 'ready to move'
+                          colors: property.status.toLowerCase() == 'ready to move'
                               ? [Color(0xFF10B981), Color(0xFF059669)]
-                              : status.toLowerCase() == 'under construction'
+                              : property.status.toLowerCase() == 'under construction'
                               ? [Color(0xFFF59E0B), Color(0xFFD97706)]
-                              : status.toLowerCase() == 'new launch'
+                              : property.status.toLowerCase() == 'new launch'
                               ? [Color(0xFF8B5CF6), Color(0xFF7C3AED)]
                               : [AppTheme.accentDark, AppTheme.primaryDark],
                         ),
@@ -217,8 +197,8 @@ Sent from RealEstate Pro App
                         ],
                       ),
                       child: Text(
-                        status,
-                        style: GoogleFonts.inter(
+                        property.status,
+                        style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
@@ -254,7 +234,7 @@ Sent from RealEstate Pro App
                           SizedBox(width: 1.w),
                           Text(
                             'WhatsApp',
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.poppins(
                               color: Color(0xFF25D366),
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
@@ -276,8 +256,8 @@ Sent from RealEstate Pro App
                 children: [
                   // Title
                   Text(
-                    title,
-                    style: GoogleFonts.inter(
+                    property.title,
+                    style: GoogleFonts.poppins(
                       color: Colors.white,
                       fontSize: 4.w,
                       fontWeight: FontWeight.w700,
@@ -295,8 +275,8 @@ Sent from RealEstate Pro App
                     children: [
                       Expanded(
                         child: Text(
-                          price,
-                          style: GoogleFonts.inter(
+                          property.formattedPrice,
+                          style: GoogleFonts.poppins(
                             color: Color(0xFFFFD700), // Gold color for price
                             fontSize: 5.w,
                             fontWeight: FontWeight.w800,
@@ -318,10 +298,10 @@ Sent from RealEstate Pro App
                           ),
                         ),
                         child: Text(
-                          type.length > 15
-                              ? type.substring(0, 12) + '...'
-                              : type,
-                          style: GoogleFonts.inter(
+                          property.propertyType.length > 15
+                              ? property.propertyType.substring(0, 12) + '...'
+                              : property.propertyType,
+                          style: GoogleFonts.poppins(
                             color: Colors.white.withValues(alpha: 0.9),
                             fontSize: 9,
                             fontWeight: FontWeight.w600,
@@ -345,8 +325,8 @@ Sent from RealEstate Pro App
                       SizedBox(width: 1.w),
                       Expanded(
                         child: Text(
-                          location,
-                          style: GoogleFonts.inter(
+                          property.fullLocation,
+                          style: GoogleFonts.poppins(
                             color: Colors.white.withValues(alpha: 0.9),
                             fontSize: 3.5.w,
                             fontWeight: FontWeight.w500,
@@ -370,8 +350,8 @@ Sent from RealEstate Pro App
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          pinCode,
-                          style: GoogleFonts.inter(
+                          property.pinCode,
+                          style: GoogleFonts.poppins(
                             color: Colors.white.withValues(alpha: 0.8),
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
