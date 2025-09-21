@@ -2,16 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
 
-import '../core/app_export.dart';
-import '../widgets/custom_error_widget.dart';
+import 'core/app_export.dart';
+import 'widgets/custom_error_widget.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize logging
+  Logger.logInfo('App starting - AI In Real Estate');
+  
+  // Check initial connectivity
+  final hasConnection = await ConnectivityService.hasInternetConnection();
+  if (!hasConnection) {
+    Logger.logWarning('App started without internet connection');
+  }
 
   bool _hasShownError = false;
 
   // 🚨 CRITICAL: Custom error handling - DO NOT REMOVE
   ErrorWidget.builder = (FlutterErrorDetails details) {
+    // Log all errors for debugging
+    Logger.logError('Flutter Error Widget', details.exception, details.stack);
+    
     if (!_hasShownError) {
       _hasShownError = true;
 
