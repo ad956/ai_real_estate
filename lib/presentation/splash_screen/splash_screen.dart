@@ -252,11 +252,22 @@ class _SplashScreenState extends State<SplashScreen>
       width: 35.w,
       height: 35.w,
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          colors: [
+            Colors.white.withValues(alpha: 0.1),
+            Colors.white.withValues(alpha: 0.05),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.2),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -265,16 +276,17 @@ class _SplashScreenState extends State<SplashScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CustomIconWidget(
-            iconName: 'home',
-            color: AppTheme.lightTheme.primaryColor,
-            size: 12.w,
+          Image.asset(
+            'assets/images/app_logo.png',
+            width: 12.w,
+            height: 12.w,
+            fit: BoxFit.contain,
           ),
           SizedBox(height: 1.h),
           Text(
             'AI In Real',
             style: AppTheme.lightTheme.textTheme.titleLarge?.copyWith(
-              color: AppTheme.lightTheme.primaryColor,
+              color: Colors.white,
               fontWeight: FontWeight.w700,
               fontSize: 13.sp,
             ),
@@ -282,7 +294,7 @@ class _SplashScreenState extends State<SplashScreen>
           Text(
             'Estate',
             style: AppTheme.lightTheme.textTheme.titleMedium?.copyWith(
-              color: AppTheme.lightTheme.colorScheme.tertiary,
+              color: Colors.white.withValues(alpha: 0.9),
               fontWeight: FontWeight.w600,
               fontSize: 12.sp,
             ),
