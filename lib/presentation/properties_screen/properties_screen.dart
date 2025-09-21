@@ -109,6 +109,82 @@ class _PropertiesScreenState extends State<PropertiesScreen>
     );
   }
 
+  void _showNotificationsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.transparent,
+        content: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: AppTheme.backgroundGradientDark,
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.2),
+              width: 1,
+            ),
+          ),
+          padding: EdgeInsets.all(6.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CustomIconWidget(
+                iconName: 'notifications_off',
+                color: Colors.white.withValues(alpha: 0.8),
+                size: 48,
+              ),
+              SizedBox(height: 3.h),
+              Text(
+                'No Notifications',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: 1.h),
+              Text(
+                'You\'re all caught up! No new notifications at the moment.',
+                style: GoogleFonts.poppins(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 3.h),
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 1.5.h),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: AppTheme.searchGradientDark,
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  child: Text(
+                    'Got it',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _onBottomNavTap(int index) {
     if (index == _currentBottomNavIndex) return;
 
@@ -209,29 +285,10 @@ class _PropertiesScreenState extends State<PropertiesScreen>
 
   Widget _buildLocationHeader() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 0.5.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Text(
-                'Location',
-                style: GoogleFonts.poppins(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              Spacer(),
-              CustomIconWidget(
-                iconName: 'notifications_outlined',
-                color: Colors.white,
-                size: 24,
-              ),
-            ],
-          ),
-          SizedBox(height: 0.5.h),
           Row(
             children: [
               CustomIconWidget(
@@ -252,6 +309,33 @@ class _PropertiesScreenState extends State<PropertiesScreen>
                 iconName: 'keyboard_arrow_down',
                 color: Colors.white,
                 size: 20,
+              ),
+              Spacer(),
+              GestureDetector(
+                onTap: _showNotificationsDialog,
+                child: Container(
+                  padding: EdgeInsets.all(2.w),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withValues(alpha: 0.1),
+                        Colors.white.withValues(alpha: 0.05),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      width: 1,
+                    ),
+                  ),
+                  child: CustomIconWidget(
+                    iconName: 'notifications_outlined',
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
               ),
             ],
           ),
