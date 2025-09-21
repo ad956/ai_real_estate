@@ -35,23 +35,27 @@ class CategoryChipsWidget extends StatelessWidget {
               duration: Duration(milliseconds: 200),
               padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
               decoration: BoxDecoration(
-                color: isSelected
-                    ? AppTheme.lightTheme.colorScheme.primary
-                    : AppTheme.lightTheme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(20),
+                gradient: isSelected
+                    ? LinearGradient(
+                        colors: [AppTheme.accentDark, AppTheme.secondaryDark],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      )
+                    : null,
+                color: isSelected ? null : Colors.white.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(25),
                 border: Border.all(
                   color: isSelected
-                      ? AppTheme.lightTheme.colorScheme.primary
-                      : AppTheme.lightTheme.colorScheme.outline,
+                      ? Colors.transparent
+                      : Colors.white.withValues(alpha: 0.3),
                   width: 1,
                 ),
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: AppTheme.lightTheme.colorScheme.primary
-                              .withValues(alpha: 0.2),
-                          blurRadius: 8,
-                          offset: Offset(0, 2),
+                          color: AppTheme.accentDark.withValues(alpha: 0.4),
+                          blurRadius: 12,
+                          offset: Offset(0, 4),
                         ),
                       ]
                     : null,
@@ -59,9 +63,7 @@ class CategoryChipsWidget extends StatelessWidget {
               child: Text(
                 category,
                 style: AppTheme.lightTheme.textTheme.labelMedium?.copyWith(
-                  color: isSelected
-                      ? AppTheme.lightTheme.colorScheme.onPrimary
-                      : AppTheme.lightTheme.colorScheme.onSurface,
+                  color: Colors.white,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 ),
               ),

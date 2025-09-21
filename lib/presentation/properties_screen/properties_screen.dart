@@ -4,8 +4,8 @@ import 'package:sizer/sizer.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/app_export.dart';
-import '../../theme/app_theme.dart';
-import '../../widgets/custom_icon_widget.dart';
+
+import '../../services/api_service.dart';
 import './widgets/empty_properties_state.dart';
 import './widgets/error_properties_state.dart';
 import './widgets/properties_shimmer_loader.dart';
@@ -22,10 +22,6 @@ class PropertiesScreen extends StatefulWidget {
 class _PropertiesScreenState extends State<PropertiesScreen>
     with TickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
-  final RefreshIndicator _refreshIndicatorKey = RefreshIndicator(
-    onRefresh: () async {},
-    child: Container(),
-  );
 
   // State variables
   bool _isLoading = true;
@@ -34,7 +30,7 @@ class _PropertiesScreenState extends State<PropertiesScreen>
   List<Map<String, dynamic>> _properties = [];
   List<Map<String, dynamic>> _filteredProperties = [];
   List<String> _categories = [];
-  int _currentBottomNavIndex = 1; // Properties tab active
+  int _currentBottomNavIndex = 0; // Properties tab active
 
   // Exact categories from reference image
   final List<String> _mockCategories = [
@@ -161,18 +157,49 @@ class _PropertiesScreenState extends State<PropertiesScreen>
     });
 
     try {
-      // Simulate API call delay
-      await Future.delayed(Duration(milliseconds: 1500));
+      final categoryData = await ApiService.getCategoryProperties();
+      if (categoryData['success'] == true) {
+        final categories = <String>[];
+        final properties = <Map<String, dynamic>>[];
 
+        for (var category in categoryData['data']) {
+          categories.add(category['category_name']);
+          for (var property in category['properties']) {
+            properties.add({
+              'id': property['id'],
+              'title': property['title'] ?? 'Property',
+              'price': property['price'] ?? 'Price on request',
+              'location':
+                  '${property['location'] ?? ''}, ${property['city'] ?? ''}',
+              'status': property['status'] ?? 'Available',
+              'pinCode': property['pin_code'] ?? '',
+              'type': property['category_name'] ??
+                  property['property_type'] ??
+                  'Property',
+              'image': property['images']?.isNotEmpty == true
+                  ? 'https://aiinrealestate.in${property['images'][0]}'
+                  : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop',
+              'bedrooms': property['bedrooms'] ?? '',
+              'bathrooms': property['bathrooms'] ?? '',
+              'area': property['area_sqft'] ?? '',
+            });
+          }
+        }
+
+        setState(() {
+          _categories = categories.isEmpty ? _mockCategories : categories;
+          _properties = properties.isEmpty ? _mockProperties : properties;
+          _filteredProperties = _properties;
+          _isLoading = false;
+        });
+      } else {
+        throw Exception('API returned success: false');
+      }
+    } catch (e) {
       setState(() {
         _categories = _mockCategories;
         _properties = _mockProperties;
         _filteredProperties = _properties;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _hasError = true;
         _isLoading = false;
       });
     }
@@ -217,24 +244,21 @@ class _PropertiesScreenState extends State<PropertiesScreen>
     );
   }
 
-  void _onEMICalculatorTap() {
-    Navigator.pushNamed(context, '/emi-calculator-screen');
-  }
-
   void _onBottomNavTap(int index) {
-    setState(() {
-      _currentBottomNavIndex = index;
-    });
+    if (index == _currentBottomNavIndex) return;
 
     switch (index) {
       case 0:
-        Navigator.pushReplacementNamed(context, '/web-stories-screen');
-        break;
-      case 1:
         // Already on Properties screen
         break;
+      case 1:
+        Navigator.pushNamed(context, '/web-stories-screen');
+        break;
       case 2:
-        Navigator.pushReplacementNamed(context, '/blog-screen');
+        Navigator.pushNamed(context, '/blog-screen');
+        break;
+      case 3:
+        // Profile screen - placeholder
         break;
     }
   }
@@ -355,128 +379,121 @@ class _PropertiesScreenState extends State<PropertiesScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: AppTheme.backgroundGradientDark,
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+    return PopScope(
+      canPop: false,
+      child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: AppTheme.backgroundGradientDark,
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: RefreshIndicator(
-            onRefresh: _onRefresh,
-            color: Colors.white,
-            backgroundColor: AppTheme.primaryDark,
-            child: Column(
-              children: [
-                // Custom App Bar
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
-                  child: Row(
-                    children: [
-                      Text(
-                        'Properties',
-                        style: GoogleFonts.inter(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Spacer(),
-                      IconButton(
-                        onPressed: () {
-                          HapticFeedback.lightImpact();
-                        },
-                        icon: CustomIconWidget(
-                          iconName: 'notifications_outlined',
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                      ),
-                    ],
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              title: Text(
+                'Properties',
+                style: GoogleFonts.inter(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                  },
+                  icon: CustomIconWidget(
+                    iconName: 'notifications_outlined',
+                    color: Colors.white,
+                    size: 24,
                   ),
                 ),
-
-                // Search Bar
-                _buildSearchBar(),
-
-                // Content
-                Expanded(child: _buildContent()),
               ],
             ),
-          ),
-        ),
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppTheme.primaryDark, AppTheme.secondaryDark],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: Offset(0, -10),
-            ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _currentBottomNavIndex,
-          onTap: _onBottomNavTap,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.transparent,
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.white.withValues(alpha: 0.6),
-          elevation: 0,
-          items: [
-            BottomNavigationBarItem(
-              icon: CustomIconWidget(
-                iconName: 'auto_stories',
-                color: _currentBottomNavIndex == 0
-                    ? Colors.white
-                    : Colors.white.withValues(alpha: 0.6),
-                size: 24,
+            body: RefreshIndicator(
+              onRefresh: _onRefresh,
+              color: Colors.white,
+              backgroundColor: AppTheme.primaryDark,
+              child: Column(
+                children: [
+                  _buildSearchBar(),
+                  Expanded(child: _buildContent()),
+                ],
               ),
-              label: 'Stories',
             ),
-            BottomNavigationBarItem(
-              icon: CustomIconWidget(
-                iconName: 'home',
-                color: _currentBottomNavIndex == 1
-                    ? Colors.white
-                    : Colors.white.withValues(alpha: 0.6),
-                size: 24,
+            bottomNavigationBar: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppTheme.primaryDark, AppTheme.secondaryDark],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 20,
+                    offset: Offset(0, -10),
+                  ),
+                ],
               ),
-              label: 'Properties',
-            ),
-            BottomNavigationBarItem(
-              icon: CustomIconWidget(
-                iconName: 'article',
-                color: _currentBottomNavIndex == 2
-                    ? Colors.white
-                    : Colors.white.withValues(alpha: 0.6),
-                size: 24,
+              child: BottomNavigationBar(
+                currentIndex: _currentBottomNavIndex,
+                onTap: _onBottomNavTap,
+                type: BottomNavigationBarType.fixed,
+                backgroundColor: Colors.transparent,
+                selectedItemColor: Colors.white,
+                unselectedItemColor: Colors.white.withValues(alpha: 0.6),
+                elevation: 0,
+                items: [
+                  BottomNavigationBarItem(
+                    icon: CustomIconWidget(
+                      iconName: 'home',
+                      color: _currentBottomNavIndex == 0
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.6),
+                      size: 24,
+                    ),
+                    label: 'Properties',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: CustomIconWidget(
+                      iconName: 'auto_stories',
+                      color: _currentBottomNavIndex == 1
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.6),
+                      size: 24,
+                    ),
+                    label: 'Stories',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: CustomIconWidget(
+                      iconName: 'article',
+                      color: _currentBottomNavIndex == 2
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.6),
+                      size: 24,
+                    ),
+                    label: 'Blog',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: CustomIconWidget(
+                      iconName: 'person_outline',
+                      color: _currentBottomNavIndex == 3
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.6),
+                      size: 24,
+                    ),
+                    label: 'Profile',
+                  ),
+                ],
               ),
-              label: 'Blog',
             ),
-            BottomNavigationBarItem(
-              icon: CustomIconWidget(
-                iconName: 'person_outline',
-                color: _currentBottomNavIndex == 3
-                    ? Colors.white
-                    : Colors.white.withValues(alpha: 0.6),
-                size: 24,
-              ),
-              label: 'Profile',
-            ),
-          ],
-        ),
-      ),
+          )),
     );
   }
 }

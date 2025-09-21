@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../core/app_export.dart';
+import '../../services/api_service.dart';
 import './widgets/category_chips_widget.dart';
 import './widgets/shimmer_loading_widget.dart';
 import './widgets/story_thumbnail_widget.dart';
@@ -129,14 +130,38 @@ class _WebStoriesScreenState extends State<WebStoriesScreen>
       _isLoading = true;
     });
 
-    // Simulate API call delay
-    await Future.delayed(Duration(milliseconds: 1500));
-
-    setState(() {
-      _stories = List.from(_mockStories);
-      _filteredStories = List.from(_stories);
-      _isLoading = false;
-    });
+    try {
+      final data = await ApiService.getWebStories();
+      if (data['success'] == true) {
+        final stories = <Map<String, dynamic>>[];
+        for (var story in data['webstories']) {
+          stories.add({
+            'id': story['id'],
+            'title': story['title'] ?? 'Story',
+            'category': 'Real Estate',
+            'duration': '2:00',
+            'imageUrl': story['details']?.isNotEmpty == true 
+              ? 'https://aiinrealestate.in${story['details'][0]['img']}'
+              : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=600&fit=crop',
+            'isRead': false,
+            'createdAt': story['date'] ?? DateTime.now().toIso8601String(),
+          });
+        }
+        setState(() {
+          _stories = stories.isEmpty ? _mockStories : stories;
+          _filteredStories = List.from(_stories);
+          _isLoading = false;
+        });
+      } else {
+        throw Exception('API returned success: false');
+      }
+    } catch (e) {
+      setState(() {
+        _stories = List.from(_mockStories);
+        _filteredStories = List.from(_stories);
+        _isLoading = false;
+      });
+    }
   }
 
   void _filterStoriesByCategory(String category) {
@@ -252,71 +277,83 @@ class _WebStoriesScreenState extends State<WebStoriesScreen>
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Scaffold(
-      backgroundColor: AppTheme.lightTheme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: Text(
-          'Web Stories',
-          style: AppTheme.lightTheme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w600,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (!didPop) {
+          Navigator.pushReplacementNamed(context, AppRoutes.properties);
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: AppTheme.backgroundGradientDark,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
-        backgroundColor: AppTheme.lightTheme.appBarTheme.backgroundColor,
-        elevation: 0,
-        actions: [
-          IconButton(
-            onPressed: () {
-              // Search functionality would be implemented here
-            },
-            icon: CustomIconWidget(
-              iconName: 'search',
-              color: AppTheme.lightTheme.colorScheme.onSurface,
-              size: 24,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            title: Text(
+              'Web Stories',
+              style: AppTheme.lightTheme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
             ),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: CustomIconWidget(
+                  iconName: 'search',
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Category Chips
-          CategoryChipsWidget(
-            categories: _categories,
-            selectedCategory: _selectedCategory,
-            onCategorySelected: _filterStoriesByCategory,
+          body: Column(
+            children: [
+              CategoryChipsWidget(
+                categories: _categories,
+                selectedCategory: _selectedCategory,
+                onCategorySelected: _filterStoriesByCategory,
+              ),
+              SizedBox(height: 2.h),
+              Expanded(
+                child: _isLoading
+                    ? ShimmerGridWidget()
+                    : RefreshIndicator(
+                        onRefresh: _onRefresh,
+                        color: AppTheme.lightTheme.colorScheme.primary,
+                        child: _filteredStories.isEmpty
+                            ? _buildEmptyState()
+                            : GridView.builder(
+                                padding: EdgeInsets.symmetric(horizontal: 4.w),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 3.w,
+                                      mainAxisSpacing: 3.w,
+                                      childAspectRatio: 0.75,
+                                    ),
+                                itemCount: _filteredStories.length,
+                                itemBuilder: (context, index) {
+                                  return StoryThumbnailWidget(
+                                    story: _filteredStories[index],
+                                    onTap: () => _openStoryViewer(index),
+                                    onLongPress: () => _showStoryActions(index),
+                                  );
+                                },
+                              ),
+                      ),
+              ),
+            ],
           ),
-
-          SizedBox(height: 2.h),
-
-          // Stories Grid
-          Expanded(
-            child: _isLoading
-                ? ShimmerGridWidget()
-                : RefreshIndicator(
-                    onRefresh: _onRefresh,
-                    color: AppTheme.lightTheme.colorScheme.primary,
-                    child: _filteredStories.isEmpty
-                        ? _buildEmptyState()
-                        : GridView.builder(
-                            padding: EdgeInsets.symmetric(horizontal: 4.w),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 3.w,
-                                  mainAxisSpacing: 3.w,
-                                  childAspectRatio: 0.75,
-                                ),
-                            itemCount: _filteredStories.length,
-                            itemBuilder: (context, index) {
-                              return StoryThumbnailWidget(
-                                story: _filteredStories[index],
-                                onTap: () => _openStoryViewer(index),
-                                onLongPress: () => _showStoryActions(index),
-                              );
-                            },
-                          ),
-                  ),
-          ),
-        ],
+        ),
       ),
     );
   }

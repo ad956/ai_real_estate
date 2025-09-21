@@ -279,7 +279,7 @@ Sent from RealEstate Pro App
                     title,
                     style: GoogleFonts.inter(
                       color: Colors.white,
-                      fontSize: 16,
+                      fontSize: 4.w,
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.5,
                       height: 1.3,
@@ -298,7 +298,7 @@ Sent from RealEstate Pro App
                           price,
                           style: GoogleFonts.inter(
                             color: Color(0xFFFFD700), // Gold color for price
-                            fontSize: 20,
+                            fontSize: 5.w,
                             fontWeight: FontWeight.w800,
                             letterSpacing: -0.5,
                           ),
@@ -348,7 +348,7 @@ Sent from RealEstate Pro App
                           location,
                           style: GoogleFonts.inter(
                             color: Colors.white.withValues(alpha: 0.9),
-                            fontSize: 13,
+                            fontSize: 3.5.w,
                             fontWeight: FontWeight.w500,
                           ),
                           maxLines: 1,

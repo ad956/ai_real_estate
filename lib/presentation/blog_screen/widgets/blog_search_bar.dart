@@ -20,27 +20,34 @@ class BlogSearchBar extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
       decoration: BoxDecoration(
-        color: AppTheme.lightTheme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppTheme.lightTheme.colorScheme.outline.withValues(alpha: 0.3),
+        gradient: LinearGradient(
+          colors: AppTheme.searchGradientDark,
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
         ),
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryDark.withValues(alpha: 0.3),
+            blurRadius: 15,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: TextField(
         controller: controller,
         onChanged: onChanged,
+        cursorColor: Colors.white,
         decoration: InputDecoration(
           hintText: "Search articles...",
           hintStyle: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
-            color: AppTheme.lightTheme.colorScheme.onSurfaceVariant.withValues(
-              alpha: 0.7,
-            ),
+            color: Colors.white.withValues(alpha: 0.8),
           ),
           prefixIcon: Padding(
             padding: EdgeInsets.all(3.w),
             child: CustomIconWidget(
               iconName: 'search',
-              color: AppTheme.lightTheme.colorScheme.onSurfaceVariant,
+              color: Colors.white,
               size: 20,
             ),
           ),
@@ -51,7 +58,7 @@ class BlogSearchBar extends StatelessWidget {
                     padding: EdgeInsets.all(3.w),
                     child: CustomIconWidget(
                       iconName: 'clear',
-                      color: AppTheme.lightTheme.colorScheme.onSurfaceVariant,
+                      color: Colors.white,
                       size: 20,
                     ),
                   ),
@@ -60,7 +67,9 @@ class BlogSearchBar extends StatelessWidget {
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
         ),
-        style: AppTheme.lightTheme.textTheme.bodyMedium,
+        style: AppTheme.lightTheme.textTheme.bodyMedium?.copyWith(
+          color: Colors.white,
+        ),
       ),
     );
   }

@@ -42,8 +42,16 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.lightTheme.scaffoldBackgroundColor,
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: AppTheme.backgroundGradientDark,
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       appBar: _isAppBarVisible ? _buildAppBar() : null,
       body: Column(
@@ -71,7 +79,8 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: WhatsAppContactWidget(property: _propertyData),
+        bottomNavigationBar: WhatsAppContactWidget(property: _propertyData),
+      ),
     );
   }
 

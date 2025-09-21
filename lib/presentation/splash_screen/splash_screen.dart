@@ -102,7 +102,7 @@ class _SplashScreenState extends State<SplashScreen>
       // Navigate to properties screen after successful initialization
       await Future.delayed(const Duration(milliseconds: 500));
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/properties-screen');
+        Navigator.pushReplacementNamed(context, AppRoutes.properties);
       }
     } catch (e) {
       setState(() {
@@ -183,7 +183,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     Future.delayed(const Duration(milliseconds: 1000), () {
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/properties-screen');
+        Navigator.pushReplacementNamed(context, AppRoutes.properties);
       }
     });
   }
@@ -203,14 +203,9 @@ class _SplashScreenState extends State<SplashScreen>
         height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppTheme.lightTheme.primaryColor,
-              AppTheme.lightTheme.colorScheme.primaryContainer,
-              AppTheme.lightTheme.colorScheme.secondary,
-            ],
-            stops: const [0.0, 0.6, 1.0],
+            colors: AppTheme.backgroundGradientDark,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
         child: SafeArea(
@@ -277,15 +272,15 @@ class _SplashScreenState extends State<SplashScreen>
           ),
           SizedBox(height: 1.h),
           Text(
-            'RealEstate',
+            'AI In Real',
             style: AppTheme.lightTheme.textTheme.titleLarge?.copyWith(
               color: AppTheme.lightTheme.primaryColor,
               fontWeight: FontWeight.w700,
-              fontSize: 14.sp,
+              fontSize: 13.sp,
             ),
           ),
           Text(
-            'Pro',
+            'Estate',
             style: AppTheme.lightTheme.textTheme.titleMedium?.copyWith(
               color: AppTheme.lightTheme.colorScheme.tertiary,
               fontWeight: FontWeight.w600,

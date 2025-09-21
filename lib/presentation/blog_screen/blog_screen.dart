@@ -355,109 +355,120 @@ class _BlogScreenState extends State<BlogScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.lightTheme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: Text(
-          "Real Estate Blog",
-          style: AppTheme.lightTheme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w600,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (!didPop) {
+          Navigator.pushReplacementNamed(context, AppRoutes.properties);
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: AppTheme.backgroundGradientDark,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
-        backgroundColor: AppTheme.lightTheme.colorScheme.surface,
-        elevation: 0,
-        actions: [
-          IconButton(
-            onPressed: () {
-              // Navigate to bookmarks
-            },
-            icon: CustomIconWidget(
-              iconName: 'bookmark_border',
-              color: AppTheme.lightTheme.colorScheme.onSurface,
-              size: 24,
-            ),
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: _onRefresh,
-        color: AppTheme.lightTheme.primaryColor,
-        child: Column(
-          children: [
-            // Search Bar
-            BlogSearchBar(
-              controller: _searchController,
-              onChanged: _onSearchChanged,
-              onClear: _clearSearch,
-            ),
-
-            // Category Chips
-            Container(
-              height: 6.h,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.symmetric(horizontal: 4.w),
-                itemCount: _categories.length,
-                itemBuilder: (context, index) {
-                  final category = _categories[index];
-                  return BlogCategoryChip(
-                    category: category,
-                    isSelected: _selectedCategory == category,
-                    onTap: () => _onCategorySelected(category),
-                  );
-                },
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            title: Text(
+              "Real Estate Blog",
+              style: AppTheme.lightTheme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
               ),
             ),
-
-            SizedBox(height: 1.h),
-
-            // Blog List
-            Expanded(
-              child: _isLoading
-                  ? ListView.builder(
-                      itemCount: 3,
-                      itemBuilder: (context, index) => BlogSkeletonLoader(),
-                    )
-                  : _filteredBlogs.isEmpty
-                  ? BlogEmptyState(
-                      title: _searchQuery.isNotEmpty
-                          ? "No articles found"
-                          : "No articles available",
-                      subtitle: _searchQuery.isNotEmpty
-                          ? "Try adjusting your search terms or browse different categories"
-                          : "Check back later for new real estate insights and tips",
-                      actionText: _searchQuery.isNotEmpty
-                          ? "Clear Search"
-                          : null,
-                      onAction: _searchQuery.isNotEmpty ? _clearSearch : null,
-                    )
-                  : ListView.builder(
-                      controller: _scrollController,
-                      physics: AlwaysScrollableScrollPhysics(),
-                      itemCount:
-                          _filteredBlogs.length + (_isLoadingMore ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index >= _filteredBlogs.length) {
-                          return Padding(
-                            padding: EdgeInsets.all(4.w),
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                color: AppTheme.lightTheme.primaryColor,
-                              ),
-                            ),
-                          );
-                        }
-
-                        final blog = _filteredBlogs[index];
-                        return BlogCard(
-                          blog: blog,
-                          onTap: () => _onBlogTap(blog),
-                          onLongPress: () => _onBlogLongPress(blog),
-                        );
-                      },
-                    ),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: CustomIconWidget(
+                  iconName: 'bookmark_border',
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+            ],
+          ),
+          body: RefreshIndicator(
+            onRefresh: _onRefresh,
+            color: AppTheme.lightTheme.primaryColor,
+            child: Column(
+              children: [
+                BlogSearchBar(
+                  controller: _searchController,
+                  onChanged: _onSearchChanged,
+                  onClear: _clearSearch,
+                ),
+                Container(
+                  height: 6.h,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.symmetric(horizontal: 4.w),
+                    itemCount: _categories.length,
+                    itemBuilder: (context, index) {
+                      final category = _categories[index];
+                      return BlogCategoryChip(
+                        category: category,
+                        isSelected: _selectedCategory == category,
+                        onTap: () => _onCategorySelected(category),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: 1.h),
+                Expanded(
+                  child: _isLoading
+                      ? ListView.builder(
+                          itemCount: 3,
+                          itemBuilder: (context, index) => BlogSkeletonLoader(),
+                        )
+                      : _filteredBlogs.isEmpty
+                      ? BlogEmptyState(
+                          title: _searchQuery.isNotEmpty
+                              ? "No articles found"
+                              : "No articles available",
+                          subtitle: _searchQuery.isNotEmpty
+                              ? "Try adjusting your search terms or browse different categories"
+                              : "Check back later for new real estate insights and tips",
+                          actionText: _searchQuery.isNotEmpty
+                              ? "Clear Search"
+                              : null,
+                          onAction: _searchQuery.isNotEmpty
+                              ? _clearSearch
+                              : null,
+                        )
+                      : ListView.builder(
+                          controller: _scrollController,
+                          physics: AlwaysScrollableScrollPhysics(),
+                          itemCount:
+                              _filteredBlogs.length + (_isLoadingMore ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            if (index >= _filteredBlogs.length) {
+                              return Padding(
+                                padding: EdgeInsets.all(4.w),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppTheme.lightTheme.primaryColor,
+                                  ),
+                                ),
+                              );
+                            }
+                            final blog = _filteredBlogs[index];
+                            return BlogCard(
+                              blog: blog,
+                              onTap: () => _onBlogTap(blog),
+                              onLongPress: () => _onBlogLongPress(blog),
+                            );
+                          },
+                        ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
