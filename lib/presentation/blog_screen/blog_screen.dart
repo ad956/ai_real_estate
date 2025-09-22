@@ -384,16 +384,7 @@ class _BlogScreenState extends State<BlogScreen> with TickerProviderStateMixin {
             backgroundColor: Colors.transparent,
             elevation: 0,
             automaticallyImplyLeading: false,
-            actions: [
-              IconButton(
-                onPressed: () {},
-                icon: CustomIconWidget(
-                  iconName: 'bookmark_border',
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
-            ],
+
           ),
           body: RefreshIndicator(
             onRefresh: _onRefresh,

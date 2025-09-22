@@ -219,16 +219,7 @@ class _WebStoriesScreenState extends State<WebStoriesScreen>
             backgroundColor: Colors.transparent,
             elevation: 0,
             automaticallyImplyLeading: false,
-            actions: [
-              IconButton(
-                onPressed: () {},
-                icon: CustomIconWidget(
-                  iconName: 'search',
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
-            ],
+
           ),
           body: Column(
             children: [

@@ -62,7 +62,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
               slivers: [
                 SliverToBoxAdapter(
                   child: PropertyImageGalleryWidget(
-                    images: property?.images ?? [],
+                    images: property?.fullImageUrls ?? [],
                     videoUrl: property?.videos.isNotEmpty == true ? property!.videos.first : null,
                   ),
                 ),

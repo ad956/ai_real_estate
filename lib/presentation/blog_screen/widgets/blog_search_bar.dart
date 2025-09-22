@@ -99,26 +99,6 @@ class _BlogSearchBarState extends State<BlogSearchBar> {
                     ),
                   ),
                 ),
-              SizedBox(width: 2.w),
-              GestureDetector(
-                onTap: widget.onFilterTap,
-                child: Container(
-                  padding: EdgeInsets.all(2.w),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: CustomIconWidget(
-                    iconName: 'tune',
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                ),
-              ),
             ],
           ),
         ));

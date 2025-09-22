@@ -152,7 +152,7 @@ class ModernPropertyCard extends StatelessWidget {
   }
 
   Widget _buildImageCounter() {
-    if (property.images.length <= 1) return SizedBox.shrink();
+    if (property.fullImageUrls.length <= 1) return SizedBox.shrink();
     
     return Positioned(
       bottom: 2.h,
@@ -173,7 +173,7 @@ class ModernPropertyCard extends StatelessWidget {
             ),
             SizedBox(width: 1.w),
             Text(
-              '${property.images.length}',
+              '${property.fullImageUrls.length}',
               style: GoogleFonts.poppins(
                 color: Colors.white,
                 fontSize: 10,

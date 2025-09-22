@@ -34,6 +34,12 @@ class _PropertiesScreenState extends State<PropertiesScreen>
   List<CategoryProperty> _categories = [];
   List<CategoryProperty> _filteredCategories = [];
   int _currentBottomNavIndex = 0;
+  
+  // Filter variables
+  String _selectedPropertyType = 'All';
+  String _selectedPriceRange = 'All';
+  String _selectedLocation = 'All';
+  String _selectedBedrooms = 'All';
 
 
 
@@ -185,6 +191,159 @@ class _PropertiesScreenState extends State<PropertiesScreen>
     );
   }
 
+  void _showFilterDialog() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        height: 70.h,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: AppTheme.backgroundGradientDark,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(4.w),
+              child: Row(
+                children: [
+                  Text(
+                    'Filters',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Spacer(),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Icon(Icons.close, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(4.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildFilterSection('Property Type', ['All', 'Apartment', 'Villa', 'Commercial'], _selectedPropertyType, (value) {
+                      setState(() => _selectedPropertyType = value);
+                    }),
+                    SizedBox(height: 3.h),
+                    _buildFilterSection('Price Range', ['All', 'Under 50L', '50L - 1Cr', '1Cr - 2Cr', 'Above 2Cr'], _selectedPriceRange, (value) {
+                      setState(() => _selectedPriceRange = value);
+                    }),
+                    SizedBox(height: 3.h),
+                    _buildFilterSection('Location', ['All', 'Alkapuri', 'Gotri', 'Fatehgunj', 'Akota'], _selectedLocation, (value) {
+                      setState(() => _selectedLocation = value);
+                    }),
+                    SizedBox(height: 3.h),
+                    _buildFilterSection('Bedrooms', ['All', '1', '2', '3', '4', '5+'], _selectedBedrooms, (value) {
+                      setState(() => _selectedBedrooms = value);
+                    }),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(4.w),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _selectedPropertyType = 'All';
+                          _selectedPriceRange = 'All';
+                          _selectedLocation = 'All';
+                          _selectedBedrooms = 'All';
+                        });
+                        _filterProperties();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white.withValues(alpha: 0.2),
+                        foregroundColor: Colors.white,
+                      ),
+                      child: Text('Clear All'),
+                    ),
+                  ),
+                  SizedBox(width: 4.w),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _filterProperties();
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryDark,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: Text('Apply Filters'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildFilterSection(String title, List<String> options, String selected, Function(String) onChanged) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(height: 1.h),
+        Wrap(
+          spacing: 2.w,
+          runSpacing: 1.h,
+          children: options.map((option) {
+            final isSelected = selected == option;
+            return GestureDetector(
+              onTap: () => onChanged(option),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppTheme.primaryDark : Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected ? AppTheme.primaryDark : Colors.white.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Text(
+                  option,
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
   void _onBottomNavTap(int index) {
     if (index == _currentBottomNavIndex) return;
 
@@ -207,21 +366,40 @@ class _PropertiesScreenState extends State<PropertiesScreen>
 
 
   void _filterProperties() {
-    if (_searchQuery.isEmpty) {
-      setState(() {
-        _filteredCategories = _categories;
-      });
-      return;
-    }
-
     final filtered = <CategoryProperty>[];
+    
     for (final category in _categories) {
       final filteredProperties = category.properties.where((property) {
-        final query = _searchQuery.toLowerCase();
-        return property.title.toLowerCase().contains(query) ||
-               property.location.toLowerCase().contains(query) ||
-               property.city.toLowerCase().contains(query) ||
-               property.fullLocation.toLowerCase().contains(query);
+        // Search query filter
+        bool matchesSearch = true;
+        if (_searchQuery.isNotEmpty) {
+          final query = _searchQuery.toLowerCase();
+          matchesSearch = property.title.toLowerCase().contains(query) ||
+                         property.location.toLowerCase().contains(query) ||
+                         property.city.toLowerCase().contains(query) ||
+                         property.description.toLowerCase().contains(query) ||
+                         property.propertyType.toLowerCase().contains(query) ||
+                         property.fullLocation.toLowerCase().contains(query);
+        }
+        
+        // Property type filter
+        bool matchesType = _selectedPropertyType == 'All' || 
+                          property.propertyType.toLowerCase().contains(_selectedPropertyType.toLowerCase());
+        
+        // Price range filter
+        bool matchesPrice = _selectedPriceRange == 'All' || _matchesPriceRange(property.price);
+        
+        // Location filter
+        bool matchesLocation = _selectedLocation == 'All' || 
+                              property.location.toLowerCase().contains(_selectedLocation.toLowerCase()) ||
+                              property.city.toLowerCase().contains(_selectedLocation.toLowerCase());
+        
+        // Bedrooms filter
+        bool matchesBedrooms = _selectedBedrooms == 'All' || 
+                              property.bedrooms == _selectedBedrooms || 
+                              (_selectedBedrooms == '5+' && int.tryParse(property.bedrooms) != null && int.parse(property.bedrooms) >= 5);
+        
+        return matchesSearch && matchesType && matchesPrice && matchesLocation && matchesBedrooms;
       }).toList();
 
       if (filteredProperties.isNotEmpty) {
@@ -236,6 +414,46 @@ class _PropertiesScreenState extends State<PropertiesScreen>
     setState(() {
       _filteredCategories = filtered;
     });
+  }
+  
+  bool _matchesPriceRange(String price) {
+    if (price.isEmpty) return true;
+    final priceNum = _extractPriceNumber(price);
+    switch (_selectedPriceRange) {
+      case 'Under 50L':
+        return priceNum < 50;
+      case '50L - 1Cr':
+        return priceNum >= 50 && priceNum < 100;
+      case '1Cr - 2Cr':
+        return priceNum >= 100 && priceNum < 200;
+      case 'Above 2Cr':
+        return priceNum >= 200;
+      default:
+        return true;
+    }
+  }
+  
+  double _extractPriceNumber(String price) {
+    if (price.isEmpty) return 0;
+    
+    final cleanPrice = price.replaceAll('₹', '').replaceAll(',', '').toLowerCase().trim();
+    
+    if (cleanPrice.contains('cr') || cleanPrice.contains('crore')) {
+      final numStr = cleanPrice.replaceAll('cr', '').replaceAll('crore', '').replaceAll('₹', '').trim();
+      return (double.tryParse(numStr) ?? 0) * 100;
+    } else if (cleanPrice.contains('lakh') || cleanPrice.contains('l ') || cleanPrice.endsWith('l')) {
+      final numStr = cleanPrice.replaceAll('lakh', '').replaceAll('lakhs', '').replaceAll('l', '').replaceAll('₹', '').trim();
+      return double.tryParse(numStr) ?? 0;
+    } else {
+      // Try to parse as direct number
+      final numStr = cleanPrice.replaceAll('₹', '').trim();
+      final num = double.tryParse(numStr) ?? 0;
+      // If number is very large, assume it's in actual rupees, convert to lakhs
+      if (num > 10000000) {
+        return num / 100000; // Convert to lakhs
+      }
+      return num;
+    }
   }
 
   Widget _buildCategoriesList() {
@@ -288,26 +506,64 @@ class _PropertiesScreenState extends State<PropertiesScreen>
         children: [
           Row(
             children: [
-              CustomIconWidget(
-                iconName: 'location_on',
-                color: AppTheme.primaryDark,
-                size: 20,
-              ),
-              SizedBox(width: 1.w),
-              Text(
-                'Vadodara, India',
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+              Container(
+                width: 8.w,
+                height: 8.w,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.white.withValues(alpha: 0.1),
+                      Colors.white.withValues(alpha: 0.05),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Center(
+                  child: Image.asset(
+                    'assets/images/app_logo.png',
+                    width: 5.w,
+                    height: 5.w,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
-              CustomIconWidget(
-                iconName: 'keyboard_arrow_down',
-                color: Colors.white,
-                size: 20,
+              SizedBox(width: 2.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        CustomIconWidget(
+                          iconName: 'location_on',
+                          color: AppTheme.primaryDark,
+                          size: 16,
+                        ),
+                        SizedBox(width: 1.w),
+                        Text(
+                          'Vadodara, India',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        CustomIconWidget(
+                          iconName: 'keyboard_arrow_down',
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              Spacer(),
               GestureDetector(
                 onTap: _showNotificationsDialog,
                 child: Container(
@@ -353,7 +609,7 @@ class _PropertiesScreenState extends State<PropertiesScreen>
               _filterProperties();
             },
             onTap: () {},
-            onFilterTap: () {},
+            onFilterTap: _showFilterDialog,
           ),
         ],
       ),
