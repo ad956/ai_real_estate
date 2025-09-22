@@ -10,7 +10,7 @@ void main() async {
 
   // Initialize logging
   Logger.logInfo('App starting - AI In Real Estate');
-  
+
   // Check initial connectivity
   final hasConnection = await ConnectivityService.hasInternetConnection();
   if (!hasConnection) {
@@ -23,7 +23,7 @@ void main() async {
   ErrorWidget.builder = (FlutterErrorDetails details) {
     // Log all errors for debugging
     Logger.logError('Flutter Error Widget', details.exception, details.stack);
-    
+
     if (!_hasShownError) {
       _hasShownError = true;
 

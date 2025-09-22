@@ -34,14 +34,12 @@ class _PropertiesScreenState extends State<PropertiesScreen>
   List<CategoryProperty> _categories = [];
   List<CategoryProperty> _filteredCategories = [];
   int _currentBottomNavIndex = 0;
-  
+
   // Filter variables
   String _selectedPropertyType = 'All';
   String _selectedPriceRange = 'All';
   String _selectedLocation = 'All';
   String _selectedBedrooms = 'All';
-
-
 
   @override
   void initState() {
@@ -105,8 +103,6 @@ class _PropertiesScreenState extends State<PropertiesScreen>
     _initializeData();
   }
 
-
-
   void _onPropertyTap(Property property) {
     Navigator.pushNamed(
       context,
@@ -165,7 +161,8 @@ class _PropertiesScreenState extends State<PropertiesScreen>
               GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 1.5.h),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 6.w, vertical: 1.5.h),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: AppTheme.searchGradientDark,
@@ -192,114 +189,146 @@ class _PropertiesScreenState extends State<PropertiesScreen>
   }
 
   void _showFilterDialog() {
+    // Create local copies of filter states
+    String tempPropertyType = _selectedPropertyType;
+    String tempPriceRange = _selectedPriceRange;
+    String tempLocation = _selectedLocation;
+    String tempBedrooms = _selectedBedrooms;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => Container(
-        height: 70.h,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: AppTheme.backgroundGradientDark,
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.all(4.w),
-              child: Row(
-                children: [
-                  Text(
-                    'Filters',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Spacer(),
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Icon(Icons.close, color: Colors.white),
-                  ),
-                ],
-              ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Container(
+          height: 70.h,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: AppTheme.backgroundGradientDark,
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
-            Expanded(
-              child: SingleChildScrollView(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+          ),
+          child: Column(
+            children: [
+              Container(
                 padding: EdgeInsets.all(4.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
-                    _buildFilterSection('Property Type', ['All', 'Apartment', 'Villa', 'Commercial'], _selectedPropertyType, (value) {
-                      setState(() => _selectedPropertyType = value);
-                    }),
-                    SizedBox(height: 3.h),
-                    _buildFilterSection('Price Range', ['All', 'Under 50L', '50L - 1Cr', '1Cr - 2Cr', 'Above 2Cr'], _selectedPriceRange, (value) {
-                      setState(() => _selectedPriceRange = value);
-                    }),
-                    SizedBox(height: 3.h),
-                    _buildFilterSection('Location', ['All', 'Alkapuri', 'Gotri', 'Fatehgunj', 'Akota'], _selectedLocation, (value) {
-                      setState(() => _selectedLocation = value);
-                    }),
-                    SizedBox(height: 3.h),
-                    _buildFilterSection('Bedrooms', ['All', '1', '2', '3', '4', '5+'], _selectedBedrooms, (value) {
-                      setState(() => _selectedBedrooms = value);
-                    }),
+                    Text(
+                      'Filters',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Spacer(),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Icon(Icons.close, color: Colors.white),
+                    ),
                   ],
                 ),
               ),
-            ),
-            Container(
-              padding: EdgeInsets.all(4.w),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          _selectedPropertyType = 'All';
-                          _selectedPriceRange = 'All';
-                          _selectedLocation = 'All';
-                          _selectedBedrooms = 'All';
-                        });
-                        _filterProperties();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white.withValues(alpha: 0.2),
-                        foregroundColor: Colors.white,
-                      ),
-                      child: Text('Clear All'),
-                    ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(4.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildFilterSection(
+                          'Property Type',
+                          ['All', 'Apartment', 'Villa', 'Commercial'],
+                          tempPropertyType, (value) {
+                        setModalState(() => tempPropertyType = value);
+                      }),
+                      SizedBox(height: 3.h),
+                      _buildFilterSection(
+                          'Price Range',
+                          [
+                            'All',
+                            'Under 50L',
+                            '50L - 1Cr',
+                            '1Cr - 2Cr',
+                            'Above 2Cr'
+                          ],
+                          tempPriceRange, (value) {
+                        setModalState(() => tempPriceRange = value);
+                      }),
+                      SizedBox(height: 3.h),
+                      _buildFilterSection(
+                          'Location',
+                          ['All', 'Alkapuri', 'Gotri', 'Fatehgunj', 'Akota'],
+                          tempLocation, (value) {
+                        setModalState(() => tempLocation = value);
+                      }),
+                      SizedBox(height: 3.h),
+                      _buildFilterSection(
+                          'Bedrooms',
+                          ['All', '1', '2', '3', '4', '5+'],
+                          tempBedrooms, (value) {
+                        setModalState(() => tempBedrooms = value);
+                      }),
+                    ],
                   ),
-                  SizedBox(width: 4.w),
-                  Expanded(
-                    flex: 2,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _filterProperties();
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryDark,
-                        foregroundColor: Colors.white,
-                      ),
-                      child: Text('Apply Filters'),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
+              Container(
+                padding: EdgeInsets.all(4.w),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setModalState(() {
+                            tempPropertyType = 'All';
+                            tempPriceRange = 'All';
+                            tempLocation = 'All';
+                            tempBedrooms = 'All';
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white.withValues(alpha: 0.2),
+                          foregroundColor: Colors.white,
+                        ),
+                        child: Text('Clear All'),
+                      ),
+                    ),
+                    SizedBox(width: 4.w),
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _selectedPropertyType = tempPropertyType;
+                            _selectedPriceRange = tempPriceRange;
+                            _selectedLocation = tempLocation;
+                            _selectedBedrooms = tempBedrooms;
+                          });
+                          _filterProperties();
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryDark,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: Text('Apply Filters'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-  
-  Widget _buildFilterSection(String title, List<String> options, String selected, Function(String) onChanged) {
+
+  Widget _buildFilterSection(String title, List<String> options,
+      String selected, Function(String) onChanged) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -322,10 +351,14 @@ class _PropertiesScreenState extends State<PropertiesScreen>
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppTheme.primaryDark : Colors.white.withValues(alpha: 0.1),
+                  color: isSelected
+                      ? AppTheme.primaryDark
+                      : Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isSelected ? AppTheme.primaryDark : Colors.white.withValues(alpha: 0.3),
+                    color: isSelected
+                        ? AppTheme.primaryDark
+                        : Colors.white.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Text(
@@ -363,11 +396,9 @@ class _PropertiesScreenState extends State<PropertiesScreen>
     }
   }
 
-
-
   void _filterProperties() {
     final filtered = <CategoryProperty>[];
-    
+
     for (final category in _categories) {
       final filteredProperties = category.properties.where((property) {
         // Search query filter
@@ -375,31 +406,44 @@ class _PropertiesScreenState extends State<PropertiesScreen>
         if (_searchQuery.isNotEmpty) {
           final query = _searchQuery.toLowerCase();
           matchesSearch = property.title.toLowerCase().contains(query) ||
-                         property.location.toLowerCase().contains(query) ||
-                         property.city.toLowerCase().contains(query) ||
-                         property.description.toLowerCase().contains(query) ||
-                         property.propertyType.toLowerCase().contains(query) ||
-                         property.fullLocation.toLowerCase().contains(query);
+              property.location.toLowerCase().contains(query) ||
+              property.city.toLowerCase().contains(query) ||
+              property.description.toLowerCase().contains(query) ||
+              property.propertyType.toLowerCase().contains(query) ||
+              property.fullLocation.toLowerCase().contains(query);
         }
-        
+
         // Property type filter
-        bool matchesType = _selectedPropertyType == 'All' || 
-                          property.propertyType.toLowerCase().contains(_selectedPropertyType.toLowerCase());
-        
+        bool matchesType = _selectedPropertyType == 'All' ||
+            property.propertyType
+                .toLowerCase()
+                .contains(_selectedPropertyType.toLowerCase());
+
         // Price range filter
-        bool matchesPrice = _selectedPriceRange == 'All' || _matchesPriceRange(property.price);
-        
+        bool matchesPrice =
+            _selectedPriceRange == 'All' || _matchesPriceRange(property.price);
+
         // Location filter
-        bool matchesLocation = _selectedLocation == 'All' || 
-                              property.location.toLowerCase().contains(_selectedLocation.toLowerCase()) ||
-                              property.city.toLowerCase().contains(_selectedLocation.toLowerCase());
-        
+        bool matchesLocation = _selectedLocation == 'All' ||
+            property.location
+                .toLowerCase()
+                .contains(_selectedLocation.toLowerCase()) ||
+            property.city
+                .toLowerCase()
+                .contains(_selectedLocation.toLowerCase());
+
         // Bedrooms filter
-        bool matchesBedrooms = _selectedBedrooms == 'All' || 
-                              property.bedrooms == _selectedBedrooms || 
-                              (_selectedBedrooms == '5+' && int.tryParse(property.bedrooms) != null && int.parse(property.bedrooms) >= 5);
-        
-        return matchesSearch && matchesType && matchesPrice && matchesLocation && matchesBedrooms;
+        bool matchesBedrooms = _selectedBedrooms == 'All' ||
+            property.bedrooms == _selectedBedrooms ||
+            (_selectedBedrooms == '5+' &&
+                int.tryParse(property.bedrooms) != null &&
+                int.parse(property.bedrooms) >= 5);
+
+        return matchesSearch &&
+            matchesType &&
+            matchesPrice &&
+            matchesLocation &&
+            matchesBedrooms;
       }).toList();
 
       if (filteredProperties.isNotEmpty) {
@@ -415,7 +459,7 @@ class _PropertiesScreenState extends State<PropertiesScreen>
       _filteredCategories = filtered;
     });
   }
-  
+
   bool _matchesPriceRange(String price) {
     if (price.isEmpty) return true;
     final priceNum = _extractPriceNumber(price);
@@ -432,17 +476,29 @@ class _PropertiesScreenState extends State<PropertiesScreen>
         return true;
     }
   }
-  
+
   double _extractPriceNumber(String price) {
     if (price.isEmpty) return 0;
-    
-    final cleanPrice = price.replaceAll('₹', '').replaceAll(',', '').toLowerCase().trim();
-    
+
+    final cleanPrice =
+        price.replaceAll('₹', '').replaceAll(',', '').toLowerCase().trim();
+
     if (cleanPrice.contains('cr') || cleanPrice.contains('crore')) {
-      final numStr = cleanPrice.replaceAll('cr', '').replaceAll('crore', '').replaceAll('₹', '').trim();
+      final numStr = cleanPrice
+          .replaceAll('cr', '')
+          .replaceAll('crore', '')
+          .replaceAll('₹', '')
+          .trim();
       return (double.tryParse(numStr) ?? 0) * 100;
-    } else if (cleanPrice.contains('lakh') || cleanPrice.contains('l ') || cleanPrice.endsWith('l')) {
-      final numStr = cleanPrice.replaceAll('lakh', '').replaceAll('lakhs', '').replaceAll('l', '').replaceAll('₹', '').trim();
+    } else if (cleanPrice.contains('lakh') ||
+        cleanPrice.contains('l ') ||
+        cleanPrice.endsWith('l')) {
+      final numStr = cleanPrice
+          .replaceAll('lakh', '')
+          .replaceAll('lakhs', '')
+          .replaceAll('l', '')
+          .replaceAll('₹', '')
+          .trim();
       return double.tryParse(numStr) ?? 0;
     } else {
       // Try to parse as direct number
@@ -460,7 +516,9 @@ class _PropertiesScreenState extends State<PropertiesScreen>
     if (_filteredCategories.isEmpty) {
       return EmptyPropertiesState(
         onRetry: _initializeData,
-        message: _searchQuery.isNotEmpty ? 'No properties found for "$_searchQuery"' : 'No properties available',
+        message: _searchQuery.isNotEmpty
+            ? 'No properties found for "$_searchQuery"'
+            : 'No properties available',
       );
     }
 
@@ -507,8 +565,8 @@ class _PropertiesScreenState extends State<PropertiesScreen>
           Row(
             children: [
               Container(
-                width: 8.w,
-                height: 8.w,
+                width: 12.w,
+                height: 12.w,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -518,7 +576,7 @@ class _PropertiesScreenState extends State<PropertiesScreen>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: Colors.white.withValues(alpha: 0.2),
                     width: 1,
@@ -527,8 +585,8 @@ class _PropertiesScreenState extends State<PropertiesScreen>
                 child: Center(
                   child: Image.asset(
                     'assets/images/app_logo.png',
-                    width: 5.w,
-                    height: 5.w,
+                    width: 12.w,
+                    height: 12.w,
                     fit: BoxFit.contain,
                   ),
                 ),
