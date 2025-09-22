@@ -95,9 +95,16 @@ class Property {
     if (images.isNotEmpty) {
       final imagePath = images.first;
       if (imagePath.startsWith('http')) return imagePath;
-      return 'https://aiinrealestate.in$imagePath';
+      return 'https://aiinrealestate.in/api$imagePath';
     }
     return 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop';
+  }
+
+  List<String> get fullImageUrls {
+    return images.map((imagePath) {
+      if (imagePath.startsWith('http')) return imagePath;
+      return 'https://aiinrealestate.in/api$imagePath';
+    }).toList();
   }
 }
 
@@ -207,6 +214,6 @@ class WebStoryDetail {
 
   String get fullImageUrl {
     if (img.startsWith('http')) return img;
-    return 'https://aiinrealestate.in$img';
+    return 'https://aiinrealestate.in/api$img';
   }
 }
