@@ -1,5 +1,5 @@
 class MockData {
-  static const bool USE_REAL_API = false; // Toggle this to switch APIs
+  static const bool USE_REAL_API = true; // Toggle this to switch APIs
 
   static const Map<String, dynamic> PROPERTIES_RESPONSE = {
     "success": true,
@@ -8,7 +8,8 @@ class MockData {
       {
         "id": 1,
         "title": "Luxury Villa in Alkapuri",
-        "description": "Beautiful 4BHK villa with modern amenities, swimming pool, and landscaped garden",
+        "description":
+            "Beautiful 4BHK villa with modern amenities, swimming pool, and landscaped garden",
         "price": "2.5 Cr",
         "location": "Alkapuri",
         "city": "Vadodara",
@@ -55,7 +56,8 @@ class MockData {
       {
         "id": 2,
         "title": "Modern Apartment in Gotri",
-        "description": "Spacious 3BHK apartment with city view and premium amenities",
+        "description":
+            "Spacious 3BHK apartment with city view and premium amenities",
         "price": "85 Lakhs",
         "location": "Gotri",
         "city": "Vadodara",
@@ -101,7 +103,8 @@ class MockData {
       {
         "id": 3,
         "title": "Cozy Studio Apartment in Manjalpur",
-        "description": "1BHK studio apartment perfect for singles or couples with modern interiors",
+        "description":
+            "1BHK studio apartment perfect for singles or couples with modern interiors",
         "price": "45 Lakhs",
         "location": "Manjalpur",
         "city": "Vadodara",
@@ -146,7 +149,8 @@ class MockData {
       {
         "id": 4,
         "title": "Commercial Office Space in Alkapuri",
-        "description": "Fully furnished office space in prime location with modern facilities",
+        "description":
+            "Fully furnished office space in prime location with modern facilities",
         "price": "3 Cr",
         "location": "Alkapuri",
         "city": "Vadodara",
@@ -202,7 +206,8 @@ class MockData {
           {
             "id": 5,
             "title": "Skyline Residency - New Launch",
-            "description": "Premium 3BHK apartments with modern amenities in prime location",
+            "description":
+                "Premium 3BHK apartments with modern amenities in prime location",
             "price": "1.2 Cr",
             "location": "Fatehgunj",
             "city": "Vadodara",
@@ -243,7 +248,13 @@ class MockData {
               "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop",
               "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop"
             ],
-            "facilities": ["Gym", "Swimming Pool", "Clubhouse", "Garden", "Security"]
+            "facilities": [
+              "Gym",
+              "Swimming Pool",
+              "Clubhouse",
+              "Garden",
+              "Security"
+            ]
           },
           {
             "id": 10,
@@ -289,7 +300,12 @@ class MockData {
               "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop",
               "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop"
             ],
-            "facilities": ["Rooftop Garden", "Spa", "Concierge", "Valet Parking"]
+            "facilities": [
+              "Rooftop Garden",
+              "Spa",
+              "Concierge",
+              "Valet Parking"
+            ]
           },
           {
             "id": 11,
@@ -334,7 +350,12 @@ class MockData {
             "images": [
               "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop"
             ],
-            "facilities": ["Smart Home", "Metro Access", "Shopping Mall", "Food Court"]
+            "facilities": [
+              "Smart Home",
+              "Metro Access",
+              "Shopping Mall",
+              "Food Court"
+            ]
           }
         ]
       },
@@ -431,7 +452,12 @@ class MockData {
               "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop",
               "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&h=600&fit=crop"
             ],
-            "facilities": ["Garden View", "Clubhouse", "Swimming Pool", "Kids Play Area"]
+            "facilities": [
+              "Garden View",
+              "Clubhouse",
+              "Swimming Pool",
+              "Kids Play Area"
+            ]
           },
           {
             "id": 13,
@@ -476,7 +502,12 @@ class MockData {
             "images": [
               "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop"
             ],
-            "facilities": ["Prime Location", "Shopping Mall", "Restaurant", "Gym"]
+            "facilities": [
+              "Prime Location",
+              "Shopping Mall",
+              "Restaurant",
+              "Gym"
+            ]
           }
         ]
       },
@@ -487,7 +518,8 @@ class MockData {
           {
             "id": 7,
             "title": "Royal Heights - Phase 2",
-            "description": "Luxury 4BHK penthouses under construction with premium amenities",
+            "description":
+                "Luxury 4BHK penthouses under construction with premium amenities",
             "price": "2.8 Cr",
             "location": "Alkapuri",
             "city": "Vadodara",
@@ -528,7 +560,12 @@ class MockData {
               "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop",
               "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop"
             ],
-            "facilities": ["Private Terrace", "Jacuzzi", "Home Theater", "Concierge"]
+            "facilities": [
+              "Private Terrace",
+              "Jacuzzi",
+              "Home Theater",
+              "Concierge"
+            ]
           },
           {
             "id": 14,
@@ -573,7 +610,12 @@ class MockData {
             "images": [
               "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop"
             ],
-            "facilities": ["Smart Home", "Solar Panels", "EV Charging", "Rainwater Harvesting"]
+            "facilities": [
+              "Smart Home",
+              "Solar Panels",
+              "EV Charging",
+              "Rainwater Harvesting"
+            ]
           }
         ]
       },
@@ -584,7 +626,8 @@ class MockData {
           {
             "id": 8,
             "title": "Garden View Villas",
-            "description": "Spacious 3BHK villas with private gardens and modern amenities",
+            "description":
+                "Spacious 3BHK villas with private gardens and modern amenities",
             "price": "1.8 Cr",
             "location": "Waghodia",
             "city": "Vadodara",
@@ -625,12 +668,18 @@ class MockData {
               "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop",
               "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&h=600&fit=crop"
             ],
-            "facilities": ["Private Garden", "Car Parking", "Security", "Clubhouse"]
+            "facilities": [
+              "Private Garden",
+              "Car Parking",
+              "Security",
+              "Clubhouse"
+            ]
           },
           {
             "id": 9,
             "title": "City Center Apartments",
-            "description": "Modern 2BHK apartments in the heart of the city with excellent connectivity",
+            "description":
+                "Modern 2BHK apartments in the heart of the city with excellent connectivity",
             "price": "95 Lakhs",
             "location": "Race Course",
             "city": "Vadodara",
@@ -670,12 +719,18 @@ class MockData {
             "images": [
               "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop"
             ],
-            "facilities": ["Metro Connectivity", "Shopping Mall", "Gym", "Security"]
+            "facilities": [
+              "Metro Connectivity",
+              "Shopping Mall",
+              "Gym",
+              "Security"
+            ]
           },
           {
             "id": 15,
             "title": "Riverside Villas",
-            "description": "Exclusive 5BHK villas with river view and private pool",
+            "description":
+                "Exclusive 5BHK villas with river view and private pool",
             "price": "3.5 Cr",
             "location": "Harni",
             "city": "Vadodara",
@@ -717,7 +772,13 @@ class MockData {
               "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop",
               "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop"
             ],
-            "facilities": ["River View", "Private Pool", "Garden", "Home Theater", "Wine Cellar"]
+            "facilities": [
+              "River View",
+              "Private Pool",
+              "Garden",
+              "Home Theater",
+              "Wine Cellar"
+            ]
           },
           {
             "id": 16,
@@ -762,7 +823,12 @@ class MockData {
             "images": [
               "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop"
             ],
-            "facilities": ["IT Hub Proximity", "Co-working Space", "Cafeteria", "Shuttle Service"]
+            "facilities": [
+              "IT Hub Proximity",
+              "Co-working Space",
+              "Cafeteria",
+              "Shuttle Service"
+            ]
           }
         ]
       }
@@ -783,8 +849,10 @@ class MockData {
         "date": "2025-01-15T04:00:00.000Z",
         "details": [
           {
-            "img": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=600&fit=crop",
-            "description": "Top investment opportunities in real estate for maximum returns"
+            "img":
+                "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=600&fit=crop",
+            "description":
+                "Top investment opportunities in real estate for maximum returns"
           }
         ]
       },
@@ -798,7 +866,8 @@ class MockData {
         "date": "2025-01-14T04:00:00.000Z",
         "details": [
           {
-            "img": "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=400&h=600&fit=crop",
+            "img":
+                "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=400&h=600&fit=crop",
             "description": "Complete guide for first-time home buyers"
           }
         ]
@@ -813,7 +882,8 @@ class MockData {
         "date": "2025-01-13T04:00:00.000Z",
         "details": [
           {
-            "img": "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=600&fit=crop",
+            "img":
+                "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=600&fit=crop",
             "description": "Explore the most luxurious villas available"
           }
         ]
@@ -828,7 +898,8 @@ class MockData {
         "date": "2025-01-12T04:00:00.000Z",
         "details": [
           {
-            "img": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=600&fit=crop",
+            "img":
+                "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=600&fit=crop",
             "description": "Budget-friendly options for first-time buyers"
           }
         ]
@@ -843,7 +914,8 @@ class MockData {
         "date": "2025-01-11T04:00:00.000Z",
         "details": [
           {
-            "img": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=600&fit=crop",
+            "img":
+                "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=600&fit=crop",
             "description": "Latest smart home features that add value"
           }
         ]
@@ -858,7 +930,8 @@ class MockData {
         "date": "2025-01-10T04:00:00.000Z",
         "details": [
           {
-            "img": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=600&fit=crop",
+            "img":
+                "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=600&fit=crop",
             "description": "Explore commercial property investment options"
           }
         ]
