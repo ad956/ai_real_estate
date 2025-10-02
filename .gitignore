@@ -47,3 +47,16 @@ app.*.map.json
 # ignore envs
 env.json
 *.env
+
+# Keystore files (NEVER commit these)
+*.jks
+*.keystore
+key.properties
+
+# Build scripts with sensitive info
+build_release.bat
+create_keystore.bat
+
+# Play Store files
+*.aab
+*.apk
