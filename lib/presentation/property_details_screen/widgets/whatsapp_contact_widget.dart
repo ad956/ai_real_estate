@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -31,7 +31,7 @@ class WhatsAppContactWidget extends StatelessWidget {
           children: [
             Expanded(
               child: ElevatedButton(
-                onPressed: () => _contactViaWhatsApp(),
+                onPressed: () => _contactViaWhatsApp(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF25D366), // WhatsApp green
                   foregroundColor: Colors.white,
@@ -64,7 +64,7 @@ class WhatsAppContactWidget extends StatelessWidget {
             ),
             SizedBox(width: 3.w),
             GestureDetector(
-              onTap: () => _callAgent(),
+              onTap: () => _callAgent(context),
               child: Container(
                 width: 12.w,
                 height: 12.w,
@@ -85,7 +85,7 @@ class WhatsAppContactWidget extends StatelessWidget {
     );
   }
 
-  void _contactViaWhatsApp() async {
+  void _contactViaWhatsApp(BuildContext context) async {
     final propertyTitle = property["title"] as String? ?? "Property";
     final propertyPrice = property["price"] as String? ?? "Price not available";
     final propertyLocation = property["location"] as String? ?? "Location not available";
@@ -103,17 +103,16 @@ class WhatsAppContactWidget extends StatelessWidget {
         throw 'Could not launch WhatsApp';
       }
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: "Could not open WhatsApp",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Could not open WhatsApp"),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
 
-  void _callAgent() async {
+  void _callAgent(BuildContext context) async {
     final phoneUrl = "tel:+919586363303";
 
     try {
@@ -123,12 +122,11 @@ class WhatsAppContactWidget extends StatelessWidget {
         throw 'Could not launch phone dialer';
       }
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: "Could not make call",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Could not make call"),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
