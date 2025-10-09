@@ -1,5 +1,5 @@
 class MockData {
-  static const bool USE_REAL_API = false; // Toggle this to switch APIs
+  static const bool USE_REAL_API = true; // Toggle this to switch APIs
 
   static const Map<String, dynamic> PROPERTIES_RESPONSE = {
     "success": true,
