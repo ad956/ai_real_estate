@@ -5,6 +5,7 @@ import 'package:sizer/sizer.dart';
 import '../../core/app_export.dart';
 import '../../services/api_service.dart';
 import '../../widgets/shared_bottom_navbar.dart';
+import '../../widgets/floating_whatsapp_button.dart';
 import './widgets/category_chips_widget.dart';
 import './widgets/shimmer_loading_widget.dart';
 import './widgets/story_thumbnail_widget.dart';
@@ -206,63 +207,68 @@ class _WebStoriesScreenState extends State<WebStoriesScreen>
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            title: Text(
-              'Web Stories',
-              style: AppTheme.lightTheme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
+        child: Stack(
+          children: [
+            Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: AppBar(
+                title: Text(
+                  'Web Stories',
+                  style: AppTheme.lightTheme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                automaticallyImplyLeading: false,
+
+              ),
+              body: Column(
+                children: [
+                  CategoryChipsWidget(
+                    categories: _categories,
+                    selectedCategory: _selectedCategory,
+                    onCategorySelected: _filterStoriesByCategory,
+                  ),
+                  SizedBox(height: 2.h),
+                  Expanded(
+                    child: _isLoading
+                        ? ShimmerGridWidget()
+                        : RefreshIndicator(
+                            onRefresh: _onRefresh,
+                            color: AppTheme.lightTheme.colorScheme.primary,
+                            child: _filteredStories.isEmpty
+                                ? _buildEmptyState()
+                                : GridView.builder(
+                                    padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 2,
+                                          crossAxisSpacing: 4.w,
+                                          mainAxisSpacing: 4.w,
+                                          childAspectRatio: 0.65,
+                                        ),
+                                    itemCount: _filteredStories.length,
+                                    itemBuilder: (context, index) {
+                                      return StoryThumbnailWidget(
+                                        story: _filteredStories[index],
+                                        onTap: () => _openStoryViewer(index),
+                                        onLongPress: () => _showStoryActions(index),
+                                      );
+                                    },
+                                  ),
+                          ),
+                    ),
+                ],
+              ),
+              bottomNavigationBar: SharedBottomNavbar(
+                currentIndex: _currentBottomNavIndex,
+                onTap: _onBottomNavTap,
               ),
             ),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            automaticallyImplyLeading: false,
-
-          ),
-          body: Column(
-            children: [
-              CategoryChipsWidget(
-                categories: _categories,
-                selectedCategory: _selectedCategory,
-                onCategorySelected: _filterStoriesByCategory,
-              ),
-              SizedBox(height: 2.h),
-              Expanded(
-                child: _isLoading
-                    ? ShimmerGridWidget()
-                    : RefreshIndicator(
-                        onRefresh: _onRefresh,
-                        color: AppTheme.lightTheme.colorScheme.primary,
-                        child: _filteredStories.isEmpty
-                            ? _buildEmptyState()
-                            : GridView.builder(
-                                padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                      crossAxisSpacing: 4.w,
-                                      mainAxisSpacing: 4.w,
-                                      childAspectRatio: 0.65,
-                                    ),
-                                itemCount: _filteredStories.length,
-                                itemBuilder: (context, index) {
-                                  return StoryThumbnailWidget(
-                                    story: _filteredStories[index],
-                                    onTap: () => _openStoryViewer(index),
-                                    onLongPress: () => _showStoryActions(index),
-                                  );
-                                },
-                              ),
-                      ),
-              ),
-            ],
-          ),
-          bottomNavigationBar: SharedBottomNavbar(
-            currentIndex: _currentBottomNavIndex,
-            onTap: _onBottomNavTap,
-          ),
+            FloatingWhatsAppButton(),
+          ],
         ),
       ),
     );

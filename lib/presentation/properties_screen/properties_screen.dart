@@ -12,6 +12,7 @@ import './widgets/modern_property_card.dart';
 import './widgets/modern_search_bar.dart';
 import './widgets/category_section.dart';
 import '../../widgets/shared_bottom_navbar.dart';
+import '../../widgets/floating_whatsapp_button.dart';
 
 class PropertiesScreen extends StatefulWidget {
   const PropertiesScreen({Key? key}) : super(key: key);
@@ -686,23 +687,28 @@ class _PropertiesScreenState extends State<PropertiesScreen>
               end: Alignment.bottomCenter,
             ),
           ),
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: RefreshIndicator(
-              onRefresh: _onRefresh,
-              color: Colors.white,
-              backgroundColor: AppTheme.primaryDark,
-              child: Column(
-                children: [
-                  SafeArea(child: _buildLocationHeader()),
-                  Expanded(child: _buildContent()),
-                ],
+          child: Stack(
+            children: [
+              Scaffold(
+                backgroundColor: Colors.transparent,
+                body: RefreshIndicator(
+                  onRefresh: _onRefresh,
+                  color: Colors.white,
+                  backgroundColor: AppTheme.primaryDark,
+                  child: Column(
+                    children: [
+                      SafeArea(child: _buildLocationHeader()),
+                      Expanded(child: _buildContent()),
+                    ],
+                  ),
+                ),
+                bottomNavigationBar: SharedBottomNavbar(
+                  currentIndex: _currentBottomNavIndex,
+                  onTap: _onBottomNavTap,
+                ),
               ),
-            ),
-            bottomNavigationBar: SharedBottomNavbar(
-              currentIndex: _currentBottomNavIndex,
-              onTap: _onBottomNavTap,
-            ),
+              FloatingWhatsAppButton(),
+            ],
           )),
     );
   }
